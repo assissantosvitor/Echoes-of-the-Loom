@@ -277,7 +277,18 @@
             border-radius: 4px;
             pointer-events: none;
         }
-        /* NOVA ÁREA DE TECELAGEM */
+        /* Canvas para a corda corrompida */
+        .battle-cord-area {
+            margin: 4px 0;
+            pointer-events: none;
+        }
+        #cord-canvas {
+            border: 1px solid var(--purple);
+            border-radius: 3px;
+            background: rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+        }
+        /* Área de tecelagem */
         .battle-weave-area {
             width: 320px;
             background: rgba(0, 0, 0, 0.6);
@@ -517,6 +528,8 @@
             justify-content: center;
             gap: 16px;
             pointer-events: auto;
+            overflow-y: auto;
+            padding: 20px;
         }
         .title-screen.hidden {
             display: none;
@@ -610,6 +623,38 @@
             z-index: 25;
             pointer-events: none;
         }
+
+        /* Tabela de como jogar */
+        .how-to-table {
+            width: 90%;
+            max-width: 600px;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            font-size: 7px;
+            color: var(--text);
+            letter-spacing: 0.5px;
+        }
+        .how-to-table th,
+        .how-to-table td {
+            padding: 6px 8px;
+            text-align: left;
+            border-bottom: 1px solid #2a2a3e;
+        }
+        .how-to-table th {
+            background: var(--panel);
+            color: var(--gold);
+            font-weight: normal;
+            letter-spacing: 1px;
+        }
+        .how-to-table tr:last-child td {
+            border-bottom: none;
+        }
+        .how-to-table td:first-child {
+            color: var(--purple);
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -657,7 +702,11 @@
                     <div class="battle-enemy-area">
                         <div class="battle-enemy-name" id="battle-enemy-name">Fio Corrompido</div>
                         <canvas class="battle-enemy-sprite" id="battle-enemy-canvas" width="72" height="72"></canvas>
-                        <!-- NOVA ÁREA DE TECELAGEM -->
+                        <!-- Animação da corda corrompida -->
+                        <div class="battle-cord-area">
+                            <canvas id="cord-canvas" width="300" height="80"></canvas>
+                        </div>
+                        <!-- Área de tecelagem -->
                         <div class="battle-weave-area" id="battle-weave-area">
                             <div class="weave-track" id="weave-track">
                                 <div class="weave-line" id="weave-line"></div>
@@ -690,15 +739,23 @@
                     <div class="subtitle">— Ecos do Tear —</div>
                     <div class="instructions">
                         Em um mundo tecido pelo destino,<br>
-                        as linhas do tempo começam a desfiar.<br><br>
-                        Explore passado e presente,<br>
-                        costure combos no combate,<br>
-                        e torne-se o Alfaiate Místico.<br><br>
-                        ⚔️ WASD mover | E interagir | C alfaiataria<br>
-                        🌀 Interaja com fendas para viajar no tempo<br>
-                        ⛶ Use o botão de tela cheia para imersão total<br>
-                        🧵 Na batalha, pressione ESPAÇO para tecer!
+                        as linhas do tempo começam a desfiar.
                     </div>
+                    <!-- TABELA DE COMO JOGAR -->
+                    <table class="how-to-table">
+                        <tr><th>⚔️ CONTROLES</th><th>🎯 AÇÃO</th></tr>
+                        <tr><td>WASD / Setas</td><td>Mover personagem</td></tr>
+                        <tr><td>E</td><td>Interagir / Avançar diálogo</td></tr>
+                        <tr><td>C</td><td>Abrir Alfaiataria (crafting)</td></tr>
+                        <tr><td>ESPAÇO</td><td>Tecer durante batalha</td></tr>
+                        <tr><th>🧵 BATALHA DE TECELAGEM</th><th>📜 REGRAS</th></tr>
+                        <tr><td>Linha verde</td><td>Pressione ESPAÇO para sincronizar: dano + selamento</td></tr>
+                        <tr><td>Linha vermelha</td><td>Erro causa retaliação e perda de progresso</td></tr>
+                        <tr><td>Selamento 100%</td><td>Linha fica amarela: use Arremate Final</td></tr>
+                        <tr><th>🌀 EXPLORAÇÃO</th><th>📍 DICAS</th></tr>
+                        <tr><td>Fendas roxas</td><td>Viaje entre passado e presente</td></tr>
+                        <tr><td>Grama alta</td><td>Encontros com inimigos</td></tr>
+                    </table>
                     <button id="start-btn">COMEÇAR JORNADA</button>
                 </div>
 
@@ -714,7 +771,7 @@
     <script>
         // ============================================================
         //  ECHOES OF THE LOOM — Ecos do Tear
-        //  Versão com batalha de tecelagem em tempo real
+        //  Versão com corda corrompida, tabela de instruções e mapa melhorado
         // ============================================================
 
         const TILE_SIZE = 32;
@@ -769,6 +826,10 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         ctx.imageSmoothingEnabled = false;
+
+        const cordCanvas = document.getElementById('cord-canvas');
+        const cordCtx = cordCanvas.getContext('2d');
+        cordCtx.imageSmoothingEnabled = false;
 
         let playerSheet = null;
         let enemySheet = null;
@@ -1073,7 +1134,7 @@
             }
         }
 
-        // ============ MAPA ============
+        // ============ MAPA (MELHORADO) ============
         const tileMapStr = [
             '1111111111111111111111111',
             '1000000000000000000000001',
@@ -1261,7 +1322,6 @@
                 attackTimer: 0,
                 attackInterval: enemyType.attackInterval || 2500,
             };
-            // Gera zonas de tecelagem (verdes e vermelhas)
             const zones = generateWeaveZones();
             battleState = {
                 enemy: enemy,
@@ -1269,11 +1329,11 @@
                 playerMp: player.mp,
                 defending: false,
                 weave: {
-                    pos: 0,           // posição da linha (0 a 100)
-                    dir: 1,           // direção (1 = direita, -1 = esquerda)
-                    speed: 0.25,      // velocidade por frame (ajustável)
+                    pos: 0,
+                    dir: 1,
+                    speed: 0.25,
                     zones: zones,
-                    progress: 0,      // progresso do selamento (0-100)
+                    progress: 0,
                     finalStrikeAvailable: false,
                     stunned: false,
                 },
@@ -1297,10 +1357,10 @@
             const zones = [];
             let x = 10;
             while (x < 90) {
-                const width = 6 + Math.random() * 8; // 6-14% de largura
-                const type = Math.random() < 0.65 ? 'green' : 'red'; // 65% verde, 35% vermelho
+                const width = 6 + Math.random() * 8;
+                const type = Math.random() < 0.65 ? 'green' : 'red';
                 zones.push({ start: x, end: x + width, type: type });
-                x += width + 5 + Math.random() * 10; // espaço entre zonas
+                x += width + 5 + Math.random() * 10;
             }
             return zones;
         }
@@ -1308,7 +1368,6 @@
         function renderWeaveZones() {
             if (!battleState) return;
             const track = document.getElementById('weave-track');
-            // Remove zonas antigas (exceto a linha)
             const existingZones = track.querySelectorAll('.weave-zone');
             existingZones.forEach(z => z.remove());
             for (const zone of battleState.weave.zones) {
@@ -1318,7 +1377,6 @@
                 div.style.width = (zone.end - zone.start) + '%';
                 track.appendChild(div);
             }
-            // Garante que a linha fique por cima
             const line = document.getElementById('weave-line');
             if (line) line.style.zIndex = 10;
         }
@@ -1338,12 +1396,11 @@
         function updateWeaveLine() {
             if (!battleState) return;
             const weave = battleState.weave;
-            if (weave.stunned) return; // parada durante paralisação
+            if (weave.stunned) return;
             const trackWidth = document.getElementById('weave-track').clientWidth;
             const lineEl = document.getElementById('weave-line');
             const posPx = (weave.pos / 100) * trackWidth;
             lineEl.style.left = posPx + 'px';
-            // Atualiza classe da linha baseado na zona
             let cls = '';
             for (const zone of weave.zones) {
                 if (weave.pos >= zone.start && weave.pos <= zone.end) {
@@ -1358,16 +1415,14 @@
         function updateBattle(deltaTime) {
             if (!battleState || battleState.weave.stunned) return;
             const weave = battleState.weave;
-            // Move a linha
             const trackWidth = document.getElementById('weave-track').clientWidth || 320;
-            const speedPx = weave.speed * trackWidth / 100; // converte para pixels
-            const delta = speedPx * (deltaTime / 16.67); // ajuste pelo tempo real
-            weave.pos += weave.dir * (delta / trackWidth) * 100; // volta para %
+            const speedPx = weave.speed * trackWidth / 100;
+            const delta = speedPx * (deltaTime / 16.67);
+            weave.pos += weave.dir * (delta / trackWidth) * 100;
             if (weave.pos >= 100) { weave.pos = 100; weave.dir = -1; }
             if (weave.pos <= 0) { weave.pos = 0; weave.dir = 1; }
             updateWeaveLine();
 
-            // Timer de ataque do inimigo
             const enemy = battleState.enemy;
             enemy.attackTimer += deltaTime;
             if (enemy.attackTimer >= enemy.attackInterval) {
@@ -1387,9 +1442,52 @@
                     }
                 } else {
                     updateBattleLog('🛡️ Defesa reduziu o dano.');
-                    battleState.defending = false; // defesa consome
+                    battleState.defending = false;
                 }
                 updateBattleStats();
+            }
+
+            // Desenha a corda corrompida
+            drawCord(battleState.weave.progress);
+        }
+
+        function drawCord(progress) {
+            cordCtx.clearRect(0, 0, 300, 80);
+            cordCtx.fillStyle = '#0a0a12';
+            cordCtx.fillRect(0, 0, 300, 80);
+            cordCtx.strokeStyle = '#8e44ad';
+            cordCtx.lineWidth = 2;
+            cordCtx.beginPath();
+            const baseY = 40;
+            const amplitude = Math.max(0, 30 - progress * 0.3); // amplitude diminui com progresso
+            const steps = 60;
+            for (let i = 0; i <= steps; i++) {
+                const x = (i / steps) * 300;
+                const y = baseY + Math.sin(i * 0.3 + Date.now() * 0.002) * amplitude;
+                if (i === 0) cordCtx.moveTo(x, y);
+                else cordCtx.lineTo(x, y);
+            }
+            cordCtx.stroke();
+
+            // Nós (knots) que desaparecem conforme progresso
+            const knotCount = Math.ceil((1 - progress / 100) * 5);
+            for (let k = 0; k < knotCount; k++) {
+                const x = 40 + k * 55;
+                const y = baseY + Math.sin(k * 1.5 + Date.now() * 0.003) * amplitude;
+                cordCtx.fillStyle = '#e74c3c';
+                cordCtx.beginPath();
+                cordCtx.arc(x, y, 4, 0, Math.PI * 2);
+                cordCtx.fill();
+            }
+
+            // Se progresso 100%, desenha linha dourada reta
+            if (progress >= 100) {
+                cordCtx.strokeStyle = '#f1c40f';
+                cordCtx.lineWidth = 3;
+                cordCtx.beginPath();
+                cordCtx.moveTo(0, baseY);
+                cordCtx.lineTo(300, baseY);
+                cordCtx.stroke();
             }
         }
 
@@ -1405,7 +1503,6 @@
             }
             if (hit) {
                 if (hit.type === 'green') {
-                    // Sincronização correta
                     const baseDamage = 15 + player.level * 2;
                     let dmg = baseDamage;
                     if (player.equippedCloak === 'tecelao') dmg *= 1.1;
@@ -1414,7 +1511,6 @@
                     weave.progress = Math.min(100, weave.progress + 20);
                     updateBattleLog('🟩 Sincronização correta! Dano: ' + dmg + ' | Selamento: ' + weave.progress + '%');
                     spawnParticles(400, 250, '#2ecc71', 8, 20);
-                    // Verifica se atingiu 100%
                     if (weave.progress >= 100) {
                         weave.finalStrikeAvailable = true;
                         document.getElementById('final-strike-btn').disabled = false;
@@ -1422,7 +1518,6 @@
                         updateBattleLog('🟨 LINHA SELADA! Arremate Final disponível!');
                     }
                 } else if (hit.type === 'red') {
-                    // Erro de tempo/posicionamento
                     const retaliation = Math.floor(battleState.enemy.atk * 1.2);
                     battleState.playerHp = Math.max(0, battleState.playerHp - retaliation);
                     weave.progress = Math.max(0, weave.progress - 15);
@@ -1430,11 +1525,9 @@
                     spawnParticles(400, 250, '#e74c3c', 10, 30);
                 }
             } else {
-                // Fora de zona: pequeno erro, sem dano mas perde progresso
                 weave.progress = Math.max(0, weave.progress - 5);
                 updateBattleLog('⚠️ Fora da zona! Progresso: ' + weave.progress + '%');
             }
-            // Atualiza UI
             document.getElementById('seal-bar-fill').style.width = weave.progress + '%';
             document.getElementById('seal-percent').textContent = weave.progress + '%';
             updateWeaveLine();
@@ -1989,7 +2082,7 @@
         }
 
         init();
-        console.log('🎮 Echoes of the Loom carregado com batalha de tecelagem!');
+        console.log('🎮 Echoes of the Loom com corda corrompida e tabela de instruções!');
     </script>
 </body>
 </html>
