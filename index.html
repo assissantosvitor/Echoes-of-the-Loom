@@ -13,624 +13,141 @@
             --panel-border: #3d2b6b;
             --gold: #d4a017;
             --text: #e8e0d0;
-            --text-dark: #2c3e50;
             --red: #e74c3c;
             --purple: #8e44ad;
             --green: #2ecc71;
             --blue: #3498db;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
-            font-family: 'Press Start 2P', monospace;
-            overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
-            margin: 0;
+            background:#000; display:flex; justify-content:center; align-items:center;
+            height:100vh; width:100vw; font-family:'Press Start 2P',monospace;
+            overflow:hidden; user-select:none; -webkit-user-select:none;
+            image-rendering:pixelated; image-rendering:crisp-edges;
         }
-
-        #game-container {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100vw;
-            height: 100vh;
-            background: #0a0a12;
-        }
-
+        #game-container { position:relative; width:100vw; height:100vh; background:#0a0a12; display:flex; justify-content:center; align-items:center; }
         #game-canvas-wrapper {
-            position: relative;
-            width: min(100vw, calc(100vh * 4 / 3));
-            height: min(100vh, calc(100vw * 3 / 4));
-            border: 4px solid var(--panel-border);
-            border-radius: 8px;
-            box-shadow: 0 0 60px rgba(142, 68, 173, 0.4), 0 0 120px rgba(212, 160, 23, 0.15);
-            overflow: hidden;
-            background: #1a1a2e;
-        }
-
-        canvas {
-            display: block;
-            width: 100% !important;
-            height: 100% !important;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
-            background: #1a1a2e;
-        }
-
-        #ui-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        #ui-overlay>* {
-            pointer-events: auto;
-        }
-
-        .fullscreen-btn {
-            position: absolute;
-            top: 8px;
-            right: 12px;
-            background: rgba(10, 10, 18, 0.8);
-            border: 2px solid var(--panel-border);
-            border-radius: 4px;
-            color: var(--text);
-            font-family: 'Press Start 2P', monospace;
-            font-size: 10px;
-            padding: 6px 10px;
-            cursor: pointer;
-            z-index: 100;
-            transition: all 0.2s;
-            pointer-events: auto;
-            letter-spacing: 1px;
-        }
-        .fullscreen-btn:hover {
-            border-color: var(--gold);
-            color: var(--gold);
-            box-shadow: 0 0 16px rgba(212, 160, 23, 0.4);
-        }
-
-        .hud {
-            position: absolute;
-            bottom: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(10, 10, 18, 0.85);
-            border: 2px solid var(--panel-border);
-            border-radius: 6px;
-            padding: 6px 12px;
-            color: var(--text);
-            font-size: 8px;
-            letter-spacing: 0.5px;
-            z-index: 20;
-            white-space: nowrap;
-            pointer-events: none;
-        }
-
-        .hud-bar {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            min-width: 100px;
-        }
-        .hud-bar .bar-label {
-            font-size: 6px;
-            color: var(--gold);
-            letter-spacing: 1px;
-        }
-        .hud-bar .bar-bg {
-            width: 100px;
-            height: 8px;
-            background: #0a0a12;
-            border: 1px solid #333;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        .hud-bar .bar-fill {
-            height: 100%;
-            border-radius: 1px;
-            transition: width 0.25s ease;
-        }
-        .bar-hp {
-            background: linear-gradient(180deg, #e74c3c, #a93226);
-        }
-        .bar-mp {
-            background: linear-gradient(180deg, #3498db, #2471a3);
-        }
-        .bar-xp {
-            background: linear-gradient(180deg, #d4a017, #b8860b);
-        }
-
-        .hud-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            font-size: 6px;
-            color: #aaa;
-        }
-        .hud-info span {
-            color: var(--text);
-        }
-        .hud-time {
-            font-size: 7px;
-            color: var(--purple);
-            text-shadow: 0 0 8px var(--purple);
-            letter-spacing: 1px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 4px 6px;
-            border-radius: 3px;
-            border: 1px solid var(--purple);
-        }
-
-        .dialog-box {
-            position: absolute;
-            bottom: 70px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            max-width: 600px;
-            background: rgba(10, 10, 18, 0.95);
-            border: 3px solid var(--gold);
-            border-radius: 8px;
-            padding: 14px 18px;
-            color: var(--text);
-            font-size: 9px;
-            line-height: 1.8;
-            letter-spacing: 0.5px;
-            z-index: 30;
-            box-shadow: 0 0 40px rgba(212, 160, 23, 0.3);
-            cursor: pointer;
-            pointer-events: auto;
-            transition: opacity 0.2s;
-        }
-        .dialog-box.hidden {
-            display: none;
-            opacity: 0;
-        }
-        .dialog-box .dialog-name {
-            color: var(--gold);
-            font-size: 7px;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-        .dialog-box .dialog-text {
-            font-size: 9px;
-            line-height: 1.7;
-        }
-        .dialog-box .dialog-hint {
-            margin-top: 10px;
-            font-size: 6px;
-            color: #888;
-            animation: blink 1.2s infinite;
-            letter-spacing: 1px;
-        }
-        @keyframes blink {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.3;
-            }
-        }
-
-        .battle-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(5, 5, 15, 0.95);
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            pointer-events: auto;
-        }
-        .battle-overlay.hidden {
-            display: none;
-        }
-
-        .battle-enemy-area {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            pointer-events: none;
-        }
-        .battle-enemy-name {
-            color: var(--red);
-            font-size: 9px;
-            letter-spacing: 1px;
-            text-shadow: 0 0 10px rgba(231, 76, 60, 0.6);
-        }
-        .battle-enemy-sprite {
-            width: 72px;
-            height: 72px;
-            image-rendering: pixelated;
-            border: 2px solid var(--panel-border);
-            border-radius: 4px;
-            pointer-events: none;
-        }
-        .battle-threads-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 22px);
-            grid-template-rows: repeat(5, 22px);
-            gap: 2px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 4px;
-            border-radius: 4px;
-            border: 1px solid var(--purple);
-            pointer-events: auto;
-        }
-        .battle-threads-grid .thread-cell {
-            width: 22px;
-            height: 22px;
-            background: #1a1a2e;
-            border: 1px solid #333;
-            border-radius: 2px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 8px;
-            color: #555;
-            cursor: pointer;
-            transition: all 0.15s;
-            user-select: none;
-        }
-        .battle-threads-grid .thread-cell.active {
-            background: var(--purple);
-            border-color: var(--gold);
-            box-shadow: 0 0 8px var(--purple);
-            color: #fff;
-        }
-        .battle-threads-grid .thread-cell.thread {
-            background: #3d1a5c;
-            border-color: #e74c3c;
-            box-shadow: 0 0 6px rgba(231, 76, 60, 0.6);
-            animation: pulse-thread 1.5s infinite;
-        }
-        .battle-threads-grid .thread-cell.thread.active {
-            background: #e74c3c;
-            border-color: #fff;
-            box-shadow: 0 0 14px #e74c3c, 0 0 28px rgba(231, 76, 60, 0.4);
-            animation: none;
-        }
-        @keyframes pulse-thread {
-            0%,
-            100% {
-                box-shadow: 0 0 4px rgba(231, 76, 60, 0.4);
-            }
-            50% {
-                box-shadow: 0 0 12px rgba(231, 76, 60, 0.9);
-            }
-        }
-
-        .battle-actions {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            justify-content: center;
-            pointer-events: auto;
-        }
-        .battle-actions button,
-        .crafting-panel button,
-        .title-screen button {
-            font-family: 'Press Start 2P', monospace;
-            font-size: 7px;
-            padding: 8px 12px;
-            background: var(--panel);
-            color: var(--text);
-            border: 2px solid var(--panel-border);
-            border-radius: 4px;
-            cursor: pointer;
-            letter-spacing: 1px;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            pointer-events: auto;
-        }
-        .battle-actions button:hover,
-        .crafting-panel button:hover,
-        .title-screen button:hover {
-            border-color: var(--gold);
-            color: var(--gold);
-            box-shadow: 0 0 16px rgba(212, 160, 23, 0.3);
-            transform: translateY(-1px);
-        }
-        .battle-actions button:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-
-        .battle-log {
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid #333;
-            border-radius: 4px;
-            padding: 6px 10px;
-            font-size: 7px;
-            color: #ccc;
-            max-width: 420px;
-            max-height: 50px;
-            overflow-y: auto;
-            letter-spacing: 0.5px;
-            line-height: 1.5;
-            pointer-events: auto;
-        }
-
-        .battle-stats {
-            display: flex;
-            gap: 16px;
-            font-size: 7px;
-            color: var(--text);
-            pointer-events: auto;
-        }
-        .battle-stats .hp-display {
-            color: var(--red);
-        }
-        .battle-stats .mp-display {
-            color: var(--blue);
-        }
-
-        .crafting-panel {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(10, 10, 18, 0.95);
-            border: 3px solid var(--gold);
-            border-radius: 8px;
-            padding: 16px 20px;
-            color: var(--text);
-            font-size: 8px;
-            z-index: 40;
-            min-width: 360px;
-            max-width: 90%;
-            box-shadow: 0 0 60px rgba(212, 160, 23, 0.25);
-            letter-spacing: 0.5px;
-            pointer-events: auto;
-        }
-        .crafting-panel.hidden {
-            display: none;
-        }
-        .crafting-panel h2 {
-            color: var(--gold);
-            font-size: 10px;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-            text-align: center;
-            text-transform: uppercase;
-        }
-        .crafting-panel .recipe {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 6px 4px;
-            border-bottom: 1px solid #2a2a3e;
-            cursor: pointer;
-            transition: background 0.2s;
-            gap: 8px;
-            pointer-events: auto;
-        }
-        .crafting-panel .recipe:hover {
-            background: rgba(142, 68, 173, 0.15);
-        }
-        .crafting-panel .recipe-name {
-            color: var(--text);
-            font-size: 7px;
-            flex: 2;
-        }
-        .crafting-panel .recipe-cost {
-            color: #aaa;
-            font-size: 6px;
-            flex: 1;
-            text-align: right;
-        }
-        .crafting-panel .recipe-craft {
-            background: var(--gold);
-            color: #0a0a12;
-            border: none;
-            border-radius: 3px;
-            padding: 4px 6px;
-            font-size: 6px;
-            cursor: pointer;
-            font-family: 'Press Start 2P', monospace;
-            transition: all 0.2s;
-            pointer-events: auto;
-        }
-        .crafting-panel .recipe-craft:hover {
-            background: #ffd700;
-            box-shadow: 0 0 12px rgba(212, 160, 23, 0.5);
-        }
-        .crafting-panel .close-btn {
-            display: block;
-            margin: 10px auto 0;
-            background: var(--panel);
-            color: var(--text);
-            border: 2px solid var(--panel-border);
-            border-radius: 4px;
-            padding: 6px 12px;
-            font-size: 7px;
-            cursor: pointer;
-            font-family: 'Press Start 2P', monospace;
-            pointer-events: auto;
-        }
-
-        .title-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(5, 5, 15, 0.93);
-            z-index: 60;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            pointer-events: auto;
-        }
-        .title-screen.hidden {
-            display: none;
-        }
-        .title-screen h1 {
-            font-size: 24px;
-            color: var(--gold);
-            letter-spacing: 4px;
-            text-shadow: 0 0 30px rgba(212, 160, 23, 0.6), 0 0 80px rgba(142, 68, 173, 0.4);
-            text-align: center;
-            line-height: 1.4;
-        }
-        .title-screen .subtitle {
-            font-size: 9px;
-            color: var(--purple);
-            letter-spacing: 3px;
-            text-shadow: 0 0 16px var(--purple);
-        }
-        .title-screen .instructions {
-            font-size: 7px;
-            color: #aaa;
-            letter-spacing: 1px;
-            line-height: 2;
-            text-align: center;
-        }
-        .title-screen button {
-            font-size: 9px;
-            padding: 12px 20px;
-            background: var(--gold);
-            color: #0a0a12;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            letter-spacing: 2px;
-            box-shadow: 0 0 30px rgba(212, 160, 23, 0.4);
-            transition: all 0.3s;
-            pointer-events: auto;
-        }
-        .title-screen button:hover {
-            box-shadow: 0 0 50px rgba(212, 160, 23, 0.7);
-            transform: scale(1.05);
-        }
-
-        .game-over-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(5, 5, 15, 0.9);
-            z-index: 70;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            pointer-events: auto;
-        }
-        .game-over-screen.hidden {
-            display: none;
-        }
-        .game-over-screen h2 {
-            font-size: 20px;
-            color: var(--red);
-            letter-spacing: 3px;
-            text-shadow: 0 0 30px rgba(231, 76, 60, 0.6);
-        }
-        .game-over-screen p {
-            font-size: 8px;
-            color: #aaa;
-        }
-        .game-over-screen button {
-            font-family: 'Press Start 2P', monospace;
-            font-size: 8px;
-            padding: 10px 16px;
-            background: var(--panel);
-            color: var(--text);
-            border: 2px solid var(--gold);
-            border-radius: 4px;
-            cursor: pointer;
-            pointer-events: auto;
-        }
-
-        .controls-hint {
-            position: absolute;
-            top: 8px;
-            left: 12px;
-            font-size: 6px;
-            color: #666;
-            letter-spacing: 0.5px;
-            z-index: 25;
-            pointer-events: none;
-        }
+            position:relative; width:min(100vw, calc(100vh * 4 / 3)); height:min(100vh, calc(100vw * 3 / 4));
+            border:4px solid var(--panel-border); border-radius:8px;
+            box-shadow:0 0 60px rgba(142,68,173,0.4), 0 0 120px rgba(212,160,23,0.15);
+            overflow:hidden; background:#1a1a2e;
+        }
+        canvas { display:block; width:100% !important; height:100% !important; image-rendering:pixelated; image-rendering:crisp-edges; background:#1a1a2e; }
+        #ui-overlay { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10; }
+        #ui-overlay > * { pointer-events:auto; }
+        .fullscreen-btn { position:absolute; top:8px; right:12px; background:rgba(10,10,18,0.8); border:2px solid var(--panel-border);
+            border-radius:4px; color:var(--text); font-family:'Press Start 2P',monospace; font-size:10px; padding:6px 10px; cursor:pointer;
+            z-index:100; transition:all 0.2s; letter-spacing:1px; }
+        .fullscreen-btn:hover { border-color:var(--gold); color:var(--gold); box-shadow:0 0 16px rgba(212,160,23,0.4); }
+        .hud { position:absolute; bottom:8px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:12px;
+            background:rgba(10,10,18,0.85); border:2px solid var(--panel-border); border-radius:6px; padding:6px 12px; color:var(--text);
+            font-size:8px; letter-spacing:0.5px; z-index:20; white-space:nowrap; pointer-events:none; }
+        .hud-bar { display:flex; flex-direction:column; gap:2px; min-width:100px; }
+        .hud-bar .bar-label { font-size:6px; color:var(--gold); letter-spacing:1px; }
+        .hud-bar .bar-bg { width:100px; height:8px; background:#0a0a12; border:1px solid #333; border-radius:2px; overflow:hidden; }
+        .hud-bar .bar-fill { height:100%; border-radius:1px; transition:width 0.25s ease; }
+        .bar-hp { background:linear-gradient(180deg, #e74c3c, #a93226); }
+        .bar-mp { background:linear-gradient(180deg, #3498db, #2471a3); }
+        .bar-xp { background:linear-gradient(180deg, #d4a017, #b8860b); }
+        .hud-info { display:flex; flex-direction:column; gap:2px; font-size:6px; color:#aaa; }
+        .hud-info span { color:var(--text); }
+        .hud-time { font-size:7px; color:var(--purple); text-shadow:0 0 8px var(--purple); letter-spacing:1px;
+            background:rgba(0,0,0,0.5); padding:4px 6px; border-radius:3px; border:1px solid var(--purple); }
+        .dialog-box { position:absolute; bottom:70px; left:50%; transform:translateX(-50%); width:80%; max-width:600px;
+            background:rgba(10,10,18,0.95); border:3px solid var(--gold); border-radius:8px; padding:14px 18px; color:var(--text);
+            font-size:9px; line-height:1.8; letter-spacing:0.5px; z-index:30; box-shadow:0 0 40px rgba(212,160,23,0.3);
+            cursor:pointer; pointer-events:auto; transition:opacity 0.2s; }
+        .dialog-box.hidden { display:none; opacity:0; }
+        .dialog-box .dialog-name { color:var(--gold); font-size:7px; letter-spacing:2px; margin-bottom:8px; text-transform:uppercase; }
+        .dialog-box .dialog-text { font-size:9px; line-height:1.7; }
+        .dialog-box .dialog-hint { margin-top:10px; font-size:6px; color:#888; animation:blink 1.2s infinite; letter-spacing:1px; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        .battle-overlay { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(5,5,15,0.95); z-index:50;
+            display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; pointer-events:auto; }
+        .battle-overlay.hidden { display:none; }
+        .battle-enemy-area { display:flex; flex-direction:column; align-items:center; gap:6px; pointer-events:none; }
+        .battle-enemy-name { color:var(--red); font-size:9px; letter-spacing:1px; text-shadow:0 0 10px rgba(231,76,60,0.6); }
+        .battle-enemy-sprite { width:72px; height:72px; image-rendering:pixelated; border:2px solid var(--panel-border); border-radius:4px; pointer-events:none; }
+        .battle-threads-grid { display:grid; grid-template-columns:repeat(5, 22px); grid-template-rows:repeat(5, 22px); gap:2px;
+            background:rgba(0,0,0,0.7); padding:4px; border-radius:4px; border:1px solid var(--purple); pointer-events:auto; }
+        .battle-threads-grid .thread-cell { width:22px; height:22px; background:#1a1a2e; border:1px solid #333; border-radius:2px;
+            display:flex; align-items:center; justify-content:center; font-size:8px; color:#555; cursor:pointer; transition:all 0.15s; }
+        .battle-threads-grid .thread-cell.active { background:var(--purple); border-color:var(--gold); box-shadow:0 0 8px var(--purple); color:#fff; }
+        .battle-threads-grid .thread-cell.thread { background:#3d1a5c; border-color:#e74c3c; box-shadow:0 0 6px rgba(231,76,60,0.6); animation:pulse-thread 1.5s infinite; }
+        .battle-threads-grid .thread-cell.thread.active { background:#e74c3c; border-color:#fff; box-shadow:0 0 14px #e74c3c, 0 0 28px rgba(231,76,60,0.4); animation:none; }
+        @keyframes pulse-thread { 0%,100%{box-shadow:0 0 4px rgba(231,76,60,0.4)} 50%{box-shadow:0 0 12px rgba(231,76,60,0.9)} }
+        .battle-actions { display:flex; gap:6px; flex-wrap:wrap; justify-content:center; pointer-events:auto; }
+        .battle-actions button, .crafting-panel button, .title-screen button { font-family:'Press Start 2P',monospace; font-size:7px;
+            padding:8px 12px; background:var(--panel); color:var(--text); border:2px solid var(--panel-border); border-radius:4px;
+            cursor:pointer; letter-spacing:1px; transition:all 0.2s; text-transform:uppercase; pointer-events:auto; }
+        .battle-actions button:hover, .crafting-panel button:hover, .title-screen button:hover { border-color:var(--gold); color:var(--gold);
+            box-shadow:0 0 16px rgba(212,160,23,0.3); transform:translateY(-1px); }
+        .battle-actions button:disabled { opacity:0.4; cursor:not-allowed; pointer-events:none; }
+        .battle-log { background:rgba(0,0,0,0.7); border:1px solid #333; border-radius:4px; padding:6px 10px; font-size:7px;
+            color:#ccc; max-width:420px; max-height:50px; overflow-y:auto; letter-spacing:0.5px; line-height:1.5; pointer-events:auto; }
+        .battle-stats { display:flex; gap:16px; font-size:7px; color:var(--text); pointer-events:auto; }
+        .battle-stats .hp-display { color:var(--red); } .battle-stats .mp-display { color:var(--blue); }
+        .crafting-panel { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(10,10,18,0.95);
+            border:3px solid var(--gold); border-radius:8px; padding:16px 20px; color:var(--text); font-size:8px; z-index:40;
+            min-width:360px; max-width:90%; box-shadow:0 0 60px rgba(212,160,23,0.25); letter-spacing:0.5px; pointer-events:auto; }
+        .crafting-panel.hidden { display:none; }
+        .crafting-panel h2 { color:var(--gold); font-size:10px; letter-spacing:2px; margin-bottom:10px; text-align:center; text-transform:uppercase; }
+        .crafting-panel .recipe { display:flex; align-items:center; justify-content:space-between; padding:6px 4px; border-bottom:1px solid #2a2a3e;
+            cursor:pointer; transition:background 0.2s; gap:8px; }
+        .crafting-panel .recipe:hover { background:rgba(142,68,173,0.15); }
+        .crafting-panel .recipe-name { color:var(--text); font-size:7px; flex:2; }
+        .crafting-panel .recipe-cost { color:#aaa; font-size:6px; flex:1; text-align:right; }
+        .crafting-panel .recipe-craft { background:var(--gold); color:#0a0a12; border:none; border-radius:3px; padding:4px 6px; font-size:6px;
+            cursor:pointer; font-family:'Press Start 2P',monospace; transition:all 0.2s; }
+        .crafting-panel .recipe-craft:hover { background:#ffd700; box-shadow:0 0 12px rgba(212,160,23,0.5); }
+        .crafting-panel .close-btn { display:block; margin:10px auto 0; background:var(--panel); color:var(--text); border:2px solid var(--panel-border);
+            border-radius:4px; padding:6px 12px; font-size:7px; cursor:pointer; font-family:'Press Start 2P',monospace; }
+        .title-screen { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(5,5,15,0.93); z-index:60;
+            display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; pointer-events:auto; }
+        .title-screen.hidden { display:none; }
+        .title-screen h1 { font-size:24px; color:var(--gold); letter-spacing:4px; text-shadow:0 0 30px rgba(212,160,23,0.6), 0 0 80px rgba(142,68,173,0.4);
+            text-align:center; line-height:1.4; }
+        .title-screen .subtitle { font-size:9px; color:var(--purple); letter-spacing:3px; text-shadow:0 0 16px var(--purple); }
+        .title-screen .instructions { font-size:7px; color:#aaa; letter-spacing:1px; line-height:2; text-align:center; }
+        .title-screen button { font-size:9px; padding:12px 20px; background:var(--gold); color:#0a0a12; border:none; border-radius:6px; cursor:pointer;
+            letter-spacing:2px; box-shadow:0 0 30px rgba(212,160,23,0.4); transition:all 0.3s; }
+        .title-screen button:hover { box-shadow:0 0 50px rgba(212,160,23,0.7); transform:scale(1.05); }
+        .game-over-screen { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(5,5,15,0.9); z-index:70;
+            display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; pointer-events:auto; }
+        .game-over-screen.hidden { display:none; }
+        .game-over-screen h2 { font-size:20px; color:var(--red); letter-spacing:3px; text-shadow:0 0 30px rgba(231,76,60,0.6); }
+        .game-over-screen p { font-size:8px; color:#aaa; }
+        .game-over-screen button { font-family:'Press Start 2P',monospace; font-size:8px; padding:10px 16px; background:var(--panel); color:var(--text);
+            border:2px solid var(--gold); border-radius:4px; cursor:pointer; }
+        .controls-hint { position:absolute; top:8px; left:12px; font-size:6px; color:#666; letter-spacing:0.5px; z-index:25; pointer-events:none; }
+        #battle-animation-canvas { position:absolute; top:0; left:0; width:100%; height:100%; z-index:55; pointer-events:none; }
     </style>
 </head>
 <body>
     <div id="game-container">
         <div id="game-canvas-wrapper">
             <canvas id="gameCanvas" width="800" height="600"></canvas>
-
             <div id="ui-overlay">
-                <button class="fullscreen-btn" id="fullscreen-btn" title="Tela cheia">⛶ Tela Cheia</button>
+                <button class="fullscreen-btn" id="fullscreen-btn">⛶ Tela Cheia</button>
                 <div class="controls-hint">WASD mover | E interagir | C alfaiataria</div>
-
                 <div class="hud" id="hud">
-                    <div class="hud-info">
-                        <span id="hud-name">Aprendiz</span>
-                        <span id="hud-level">Nv. 1</span>
-                    </div>
-                    <div class="hud-bar">
-                        <span class="bar-label">HP</span>
-                        <div class="bar-bg"><div class="bar-fill bar-hp" id="hud-hp" style="width:100%"></div></div>
-                    </div>
-                    <div class="hud-bar">
-                        <span class="bar-label">MP</span>
-                        <div class="bar-bg"><div class="bar-fill bar-mp" id="hud-mp" style="width:100%"></div></div>
-                    </div>
-                    <div class="hud-bar">
-                        <span class="bar-label">XP</span>
-                        <div class="bar-bg"><div class="bar-fill bar-xp" id="hud-xp" style="width:0%"></div></div>
-                    </div>
+                    <div class="hud-info"><span id="hud-name">Aprendiz</span><span id="hud-level">Nv. 1</span></div>
+                    <div class="hud-bar"><span class="bar-label">HP</span><div class="bar-bg"><div class="bar-fill bar-hp" id="hud-hp" style="width:100%"></div></div></div>
+                    <div class="hud-bar"><span class="bar-label">MP</span><div class="bar-bg"><div class="bar-fill bar-mp" id="hud-mp" style="width:100%"></div></div></div>
+                    <div class="hud-bar"><span class="bar-label">XP</span><div class="bar-bg"><div class="bar-fill bar-xp" id="hud-xp" style="width:0%"></div></div></div>
                     <div class="hud-time" id="hud-time">⏳ Passado</div>
                 </div>
-
                 <div class="dialog-box hidden" id="dialog-box">
                     <div class="dialog-name" id="dialog-name"></div>
                     <div class="dialog-text" id="dialog-text"></div>
                     <div class="dialog-hint">[ E ou clique ] para continuar</div>
                 </div>
-
                 <div class="crafting-panel hidden" id="crafting-panel">
                     <h2>🧵 A Alfaiataria</h2>
                     <div id="crafting-recipes"></div>
                     <button class="close-btn" id="crafting-close">Fechar (C)</button>
                 </div>
-
                 <div class="battle-overlay hidden" id="battle-overlay">
                     <div class="battle-enemy-area">
                         <div class="battle-enemy-name" id="battle-enemy-name">Fio Corrompido</div>
@@ -657,7 +174,7 @@
                         <button data-action="flee">🏃 Fugir</button>
                     </div>
                 </div>
-
+                <canvas id="battle-animation-canvas" width="800" height="600"></canvas>
                 <div class="title-screen" id="title-screen">
                     <h1>ECHOES<br>OF THE<br>LOOM</h1>
                     <div class="subtitle">— Ecos do Tear —</div>
@@ -673,7 +190,6 @@
                     </div>
                     <button id="start-btn">COMEÇAR JORNADA</button>
                 </div>
-
                 <div class="game-over-screen hidden" id="game-over-screen">
                     <h2>DESTINO DESFIADO</h2>
                     <p>Os fios corrompidos consumiram você...</p>
@@ -686,113 +202,51 @@
     <script>
         // ============================================================
         //  ECHOES OF THE LOOM — Ecos do Tear
-        //  Versão com tela cheia, combate aprimorado e diálogos corrigidos
+        //  Versão final unificada
         // ============================================================
 
+        // ----- Constantes -----
         const TILE_SIZE = 32;
-        const SPRITE_W = 16;
-        const SPRITE_H = 16;
-        const ZOOM = 2;
-        const MAP_W = 25;
-        const MAP_H = 18;
-        const CANVAS_W = 800;
-        const CANVAS_H = 600;
+        const SPRITE_W = 16, SPRITE_H = 16, ZOOM = 2;
+        const MAP_W = 25, MAP_H = 18;
+        const CANVAS_W = 800, CANVAS_H = 600;
 
+        // ----- Estado -----
         let gameState = 'title';
         let currentTime = 'past';
         let player = {
-            x: 3 * TILE_SIZE,
-            y: 8 * TILE_SIZE,
-            dir: 'down',
-            frame: 0,
-            moving: false,
-            moveTimer: 0,
-            hp: 100,
-            maxHp: 100,
-            mp: 50,
-            maxMp: 50,
-            xp: 0,
-            xpToNext: 30,
-            level: 1,
-            gold: 20,
-            inventory: {
-                commonThread: 5,
-                starSilk: 2,
-                timeThread: 1,
-                corruptedThread: 0,
-                potions: 3,
-                ethers: 1,
-            },
-            equippedCloak: null,
-            cloaksOwned: [],
-            defending: false,
+            x: 3 * TILE_SIZE, y: 8 * TILE_SIZE, dir: 'down', frame: 0, moving: false, moveTimer: 0,
+            hp: 100, maxHp: 100, mp: 50, maxMp: 50, xp: 0, xpToNext: 30, level: 1,
+            inventory: { commonThread: 5, starSilk: 2, timeThread: 1, corruptedThread: 0, potions: 3, ethers: 1 },
+            equippedCloak: null, cloaksOwned: [], defending: false,
         };
-        let enemies = [];
-        let npcs = [];
-        let particles = [];
-        let dialogQueue = [];
-        let activeDialog = null;
+        let particles = [], dialogQueue = [], activeDialog = null, dialogLock = false;
         let battleState = null;
         let keys = {};
-        let lastStepTime = 0;
-        let encounterChance = 0.04;
-        let dialogLock = false;
+        let encounterChance = 0.03;
+        let mapEnemies = [];
 
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const battleAnimCanvas = document.getElementById('battle-animation-canvas');
+        const battleAnimCtx = battleAnimCanvas.getContext('2d');
         ctx.imageSmoothingEnabled = false;
+        battleAnimCtx.imageSmoothingEnabled = false;
 
-        let playerSheet = null;
-        let enemySheet = null;
-        let npcSheet = null;
+        let playerSheet, enemySheet, npcSheet;
         let tileSheets = { past: {}, present: {} };
 
-        // ============ SPRITE GENERATION ============
+        // ============ PALETAS ============
         const PALETTES = {
-            player: {
-                '.': null,
-                'H': '#3D2B1F',
-                'F': '#F0C8A0',
-                'E': '#1A1A2E',
-                'C': '#2C3E50',
-                'S': '#ECF0F1',
-                'P': '#1A252F',
-                'B': '#3D2B1F',
-                'G': '#D4A017',
-                'L': '#9B59B6',
-                'R': '#C0392B',
-                'W': '#FFFFFF',
-            },
-            enemy: {
-                '.': null,
-                'D': '#2C0E3E',
-                'R': '#E74C3C',
-                'P': '#8E44AD',
-                'Y': '#F1C40F',
-                'B': '#1A1A2E',
-                'G': '#D4A017',
-                'W': '#FFFFFF',
-                'V': '#6C3483',
-            },
-            npc: {
-                '.': null,
-                'H': '#4A3728',
-                'F': '#F0C8A0',
-                'E': '#1A1A2E',
-                'C': '#5D4E37',
-                'S': '#D4C5A9',
-                'B': '#3D2B1F',
-                'G': '#D4A017',
-                'W': '#E8E0D0',
-                'R': '#8B4513',
-                'V': '#6C3483',
-            },
+            player: { '.': null, 'H': '#3D2B1F', 'F': '#F0C8A0', 'E': '#1A1A2E', 'C': '#2C3E50', 'S': '#ECF0F1', 'P': '#1A252F', 'B': '#3D2B1F', 'G': '#D4A017', 'L': '#9B59B6', 'R': '#C0392B', 'W': '#FFFFFF' },
+            enemy: { '.': null, 'D': '#2C0E3E', 'R': '#E74C3C', 'P': '#8E44AD', 'Y': '#F1C40F', 'B': '#1A1A2E', 'G': '#D4A017', 'W': '#FFFFFF', 'V': '#6C3483' },
+            npc: { '.': null, 'H': '#4A3728', 'F': '#F0C8A0', 'E': '#1A1A2E', 'C': '#5D4E37', 'S': '#D4C5A9', 'B': '#3D2B1F', 'G': '#D4A017', 'W': '#E8E0D0', 'R': '#8B4513', 'V': '#6C3483' },
         };
 
+        // ============ FUNÇÕES DE SPRITE ============
         function stringToSprite(strArray, palette, w = SPRITE_W, h = SPRITE_H) {
             const off = document.createElement('canvas');
-            off.width = w;
-            off.height = h;
+            off.width = w; off.height = h;
             const offCtx = off.getContext('2d');
             offCtx.imageSmoothingEnabled = false;
             for (let y = 0; y < h; y++) {
@@ -869,29 +323,20 @@
             ];
 
             const sprites = [];
-            const mapDir = { down: [baseDown0, baseDown1], up: [baseUp0, baseUp1], left: [baseLeft0, baseLeft1],
-                right: [baseLeft0, baseLeft1] };
+            const mapDir = { down: [baseDown0, baseDown1], up: [baseUp0, baseUp1], left: [baseLeft0, baseLeft1], right: [baseLeft0, baseLeft1] };
             for (const dir of dirs) {
                 const [f0, f1] = mapDir[dir];
                 const spr0 = stringToSprite(f0, palette);
                 const spr1 = stringToSprite(f1, palette);
                 if (dir === 'right') {
                     const off0 = document.createElement('canvas');
-                    off0.width = SPRITE_W;
-                    off0.height = SPRITE_H;
-                    const c0 = off0.getContext('2d');
-                    c0.imageSmoothingEnabled = false;
-                    c0.translate(SPRITE_W, 0);
-                    c0.scale(-1, 1);
-                    c0.drawImage(spr0, 0, 0);
+                    off0.width = SPRITE_W; off0.height = SPRITE_H;
+                    const c0 = off0.getContext('2d'); c0.imageSmoothingEnabled = false;
+                    c0.translate(SPRITE_W, 0); c0.scale(-1, 1); c0.drawImage(spr0, 0, 0);
                     const off1 = document.createElement('canvas');
-                    off1.width = SPRITE_W;
-                    off1.height = SPRITE_H;
-                    const c1 = off1.getContext('2d');
-                    c1.imageSmoothingEnabled = false;
-                    c1.translate(SPRITE_W, 0);
-                    c1.scale(-1, 1);
-                    c1.drawImage(spr1, 0, 0);
+                    off1.width = SPRITE_W; off1.height = SPRITE_H;
+                    const c1 = off1.getContext('2d'); c1.imageSmoothingEnabled = false;
+                    c1.translate(SPRITE_W, 0); c1.scale(-1, 1); c1.drawImage(spr1, 0, 0);
                     sprites.push(off0, off1, off0);
                 } else {
                     sprites.push(spr0, spr1, spr0);
@@ -953,92 +398,52 @@
                 '...VVVVVVVVVV...', '....VVVVVVVV....', '.....CCCCCC.....', '...CCCCCCCCCC...',
                 '..CCCCCCCCCCCC..', '..CCCCCCCCCCCC..', '.....PP..PP.....', '....BB....BB....',
             ];
-            return createSpriteSheet([stringToSprite(npc1, palette), stringToSprite(npc2, palette),
-                stringToSprite(npc3, palette)], SPRITE_W, SPRITE_H, 3, 1);
+            return createSpriteSheet([stringToSprite(npc1, palette), stringToSprite(npc2, palette), stringToSprite(npc3, palette)], SPRITE_W, SPRITE_H, 3, 1);
         }
 
         function createTileSheets() {
             const types = ['floor', 'wall', 'rift', 'water', 'grass', 'tailor'];
             const pastColors = {
-                floor: ['#B8A88A', '#A89878', '#C8B89A'],
-                wall: ['#7B6B5A', '#6B5B4A', '#8B7B6A'],
-                rift: ['#8E44AD', '#9B59B6', '#7D3C98'],
-                water: ['#5DADE2', '#5499C7', '#6EC6FF'],
-                grass: ['#7D8B5A', '#6D7B4A', '#8D9B6A'],
-                tailor: ['#D4A017', '#C49010', '#E0B020'],
+                floor: ['#B8A88A', '#A89878', '#C8B89A'], wall: ['#7B6B5A', '#6B5B4A', '#8B7B6A'],
+                rift: ['#8E44AD', '#9B59B6', '#7D3C98'], water: ['#5DADE2', '#5499C7', '#6EC6FF'],
+                grass: ['#7D8B5A', '#6D7B4A', '#8D9B6A'], tailor: ['#D4A017', '#C49010', '#E0B020'],
             };
             const presentColors = {
-                floor: ['#6B5B4A', '#5B4B3A', '#7B6B5A'],
-                wall: ['#4A3F35', '#3A2F25', '#5A4F45'],
-                rift: ['#6C3483', '#7D3C98', '#5B2C6F'],
-                water: ['#3D5A6E', '#2D4A5E', '#4D6A7E'],
-                grass: ['#5A6B3A', '#4A5B2A', '#6A7B4A'],
-                tailor: ['#8B6914', '#7B5904', '#9B7920'],
+                floor: ['#6B5B4A', '#5B4B3A', '#7B6B5A'], wall: ['#4A3F35', '#3A2F25', '#5A4F45'],
+                rift: ['#6C3483', '#7D3C98', '#5B2C6F'], water: ['#3D5A6E', '#2D4A5E', '#4D6A7E'],
+                grass: ['#5A6B3A', '#4A5B2A', '#6A7B4A'], tailor: ['#8B6914', '#7B5904', '#9B7920'],
             };
             for (const time of ['past', 'present']) {
                 const colors = time === 'past' ? pastColors : presentColors;
                 for (const type of types) {
                     const off = document.createElement('canvas');
-                    off.width = TILE_SIZE;
-                    off.height = TILE_SIZE;
+                    off.width = TILE_SIZE; off.height = TILE_SIZE;
                     const c = off.getContext('2d');
                     c.imageSmoothingEnabled = false;
                     c.fillStyle = colors[type][0];
                     c.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
                     if (type === 'floor') {
-                        for (let i = 0; i < 8; i++) {
-                            c.fillStyle = colors[type][(i % 2) + 1];
-                            c.fillRect(Math.floor(Math.random() * TILE_SIZE), Math.floor(Math.random() * TILE_SIZE), 3, 3);
-                        }
-                        c.fillStyle = colors[type][2];
-                        c.fillRect(4, 4, 2, 2);
-                        c.fillRect(22, 18, 2, 2);
+                        for (let i = 0; i < 8; i++) { c.fillStyle = colors[type][(i % 2) + 1]; c.fillRect(Math.floor(Math.random() * TILE_SIZE), Math.floor(Math.random() * TILE_SIZE), 3, 3); }
+                        c.fillStyle = colors[type][2]; c.fillRect(4, 4, 2, 2); c.fillRect(22, 18, 2, 2);
                     } else if (type === 'wall') {
                         c.fillStyle = colors[type][2];
-                        for (let row = 0; row < 8; row++)
-                            for (let col = 0; col < 4; col++)
-                                if ((row + col) % 3 === 0) c.fillRect(col * 8, row * 8, 4, 4);
-                        c.fillStyle = colors[type][1];
-                        c.fillRect(0, 0, TILE_SIZE, 2);
-                        c.fillRect(0, TILE_SIZE - 2, TILE_SIZE, 2);
+                        for (let row = 0; row < 8; row++) for (let col = 0; col < 4; col++) if ((row + col) % 3 === 0) c.fillRect(col * 8, row * 8, 4, 4);
+                        c.fillStyle = colors[type][1]; c.fillRect(0, 0, TILE_SIZE, 2); c.fillRect(0, TILE_SIZE - 2, TILE_SIZE, 2);
                     } else if (type === 'rift') {
-                        c.fillStyle = colors[type][0];
-                        c.beginPath();
-                        c.arc(16, 16, 10 + Math.random() * 3, 0, Math.PI * 2);
-                        c.fill();
-                        c.fillStyle = colors[type][2];
-                        c.beginPath();
-                        c.arc(16, 16, 6, 0, Math.PI * 2);
-                        c.fill();
-                        c.fillStyle = 'rgba(255,255,255,0.6)';
-                        c.beginPath();
-                        c.arc(14, 14, 3, 0, Math.PI * 2);
-                        c.fill();
+                        c.fillStyle = colors[type][0]; c.beginPath(); c.arc(16, 16, 10 + Math.random() * 3, 0, Math.PI * 2); c.fill();
+                        c.fillStyle = colors[type][2]; c.beginPath(); c.arc(16, 16, 6, 0, Math.PI * 2); c.fill();
+                        c.fillStyle = 'rgba(255,255,255,0.6)'; c.beginPath(); c.arc(14, 14, 3, 0, Math.PI * 2); c.fill();
                     } else if (type === 'water') {
-                        c.fillStyle = colors[type][1];
-                        for (let i = 0; i < 6; i++) c.fillRect(Math.floor(Math.random() * TILE_SIZE), Math.floor(Math
-                            .random() * TILE_SIZE), 6, 2);
-                        c.fillStyle = colors[type][2];
-                        c.fillRect(8, 12, 4, 4);
-                        c.fillRect(18, 6, 3, 3);
+                        c.fillStyle = colors[type][1]; for (let i = 0; i < 6; i++) c.fillRect(Math.floor(Math.random() * TILE_SIZE), Math.floor(Math.random() * TILE_SIZE), 6, 2);
+                        c.fillStyle = colors[type][2]; c.fillRect(8, 12, 4, 4); c.fillRect(18, 6, 3, 3);
                     } else if (type === 'grass') {
-                        for (let i = 0; i < 12; i++) {
-                            c.fillStyle = colors[type][(i % 2) + 1];
-                            c.fillRect(Math.floor(Math.random() * TILE_SIZE), Math.floor(Math.random() * TILE_SIZE), 3, 4);
-                        }
-                        c.fillStyle = colors[type][2];
-                        c.fillRect(6, 10, 4, 3);
-                        c.fillRect(20, 20, 3, 3);
+                        for (let i = 0; i < 12; i++) { c.fillStyle = colors[type][(i % 2) + 1]; c.fillRect(Math.floor(Math.random() * TILE_SIZE), Math.floor(Math.random() * TILE_SIZE), 3, 4); }
+                        c.fillStyle = colors[type][2]; c.fillRect(6, 10, 4, 3); c.fillRect(20, 20, 3, 3);
                     } else if (type === 'tailor') {
-                        c.fillStyle = colors[type][1];
-                        c.fillRect(2, 2, TILE_SIZE - 4, TILE_SIZE - 4);
-                        c.fillStyle = colors[type][0];
-                        c.fillRect(6, 6, 20, 20);
-                        c.fillStyle = colors[type][2];
-                        c.fillRect(10, 10, 4, 4);
-                        c.fillRect(18, 18, 4, 4);
-                        c.fillStyle = 'rgba(255,255,255,0.3)';
-                        c.fillRect(8, 8, 16, 2);
+                        c.fillStyle = colors[type][1]; c.fillRect(2, 2, TILE_SIZE - 4, TILE_SIZE - 4);
+                        c.fillStyle = colors[type][0]; c.fillRect(6, 6, 20, 20);
+                        c.fillStyle = colors[type][2]; c.fillRect(10, 10, 4, 4); c.fillRect(18, 18, 4, 4);
+                        c.fillStyle = 'rgba(255,255,255,0.3)'; c.fillRect(8, 8, 16, 2);
                     }
                     tileSheets[time][type] = off;
                 }
@@ -1067,122 +472,156 @@
             '1111111111111111111111111',
         ];
         const tileMap = [];
-        for (let y = 0; y < MAP_H; y++) {
-            tileMap[y] = [];
-            for (let x = 0; x < MAP_W; x++) {
-                tileMap[y][x] = parseInt(tileMapStr[y] ? tileMapStr[y][x] : '1');
+        for (let y = 0; y < MAP_H; y++) { tileMap[y] = []; for (let x = 0; x < MAP_W; x++) tileMap[y][x] = parseInt(tileMapStr[y] ? tileMapStr[y][x] : '1'); }
+
+        function isWalkable(tx, ty) { return tx >= 0 && tx < MAP_W && ty >= 0 && ty < MAP_H && [0, 2, 4, 5].includes(tileMap[ty][tx]); }
+        function isGrassTile(tx, ty) { return tx >= 0 && tx < MAP_W && ty >= 0 && ty < MAP_H && tileMap[ty][tx] === 4; }
+        function isRiftTile(tx, ty) { return tx >= 0 && tx < MAP_W && ty >= 0 && ty < MAP_H && tileMap[ty][tx] === 2; }
+        function isTailorTile(tx, ty) { return tx >= 0 && tx < MAP_W && ty >= 0 && ty < MAP_H && tileMap[ty][tx] === 5; }
+
+        // ============ NPCS (com lore expandido) ============
+        const npcDefinitions = [
+            { id: 'master', name: 'Mestre Alfaiate', x: 2, y: 4, spriteIndex: 0, pastOnly: true,
+              dialogues: { past: [
+                'Bem-vindo, jovem aprendiz. O destino de todos é tecido na grande tapeçaria.',
+                'As fendas estão desfiando a realidade. Você deve restaurar os fios.',
+                'Use a Alfaiataria para criar mantos poderosos. (Pressione C)',
+                'Cuidado com as criaturas de fios corrompidos nas áreas de grama alta.',
+                'No passado, o Tear era alimentado pelos Sonhadores, que teciam destinos com seus sonhos.',
+                'Mas a corrupção veio quando os Sonhadores desapareceram...',
+              ], present: ['As ruínas do que fomos... O tear está silencioso agora.'] } },
+            { id: 'citizen', name: 'Cidadã', x: 10, y: 3, spriteIndex: 1, pastOnly: true,
+              dialogues: { past: [
+                'A cidade prospera graças ao Tear Cósmico. Os fios do destino nos guiam.',
+                'Dizem que alguns fios começaram a desfiar perto da fonte antiga...',
+                'Meu avô contava histórias de uma época em que os deuses teciam as estrelas.',
+              ], present: ['A fonte secou... os fios se romperam.'] } },
+            { id: 'child', name: 'Criança', x: 15, y: 10, spriteIndex: 1, pastOnly: true,
+              dialogues: { past: [
+                'Eu sonhei com fios dourados! Eles brilhavam como estrelas.',
+                'O velho alfaiate disse que meus sonhos são fios do destino.',
+                'Será que um dia eu vou tecer meu próprio destino?',
+              ], present: ['A criança não está mais aqui. Apenas ecos de risos...'] } },
+            { id: 'spirit', name: 'Espírito do Tear', x: 14, y: 13, spriteIndex: 2, pastOnly: false,
+              dialogues: { past: [
+                'O tempo é um tear, e nós somos os fios. Belo, não?',
+                'Quando o passado e o presente se entrelaçam, o impossível acontece.',
+                'No início, havia apenas o Fio Primordial, e dele tudo foi tecido.',
+                'Os corrompidos são fios que se recusam a ser tecidos.',
+              ], present: [
+                'Vejo que você encontrou o caminho entre os tempos.',
+                'Os fios corrompidos nascem do desespero. Purifique-os.',
+                'Crie mantos com os tecidos que coletar. Eles o protegerão.',
+                'A tapeçaria está rasgada, mas ainda pode ser remendada.',
+              ] } },
+            { id: 'loom_keeper', name: 'Guardião do Tear', x: 6, y: 7, spriteIndex: 2, pastOnly: false,
+              dialogues: { past: [
+                'Sou o último Guardião do Tear. Sinto a corrupção se espalhando.',
+                'Os Sonhadores desapareceram porque seus sonhos foram corrompidos.',
+                'Você deve encontrar os fios de esperança que restam.',
+                'Quando o Tear for restaurado, os Sonhadores retornarão.',
+              ], present: [
+                'Ainda estou aqui, preso entre os fios quebrados.',
+                'Cada criatura corrompida era um sonho que foi distorcido.',
+                'Você precisa tecer novos sonhos para curar o mundo.',
+              ] } },
+        ];
+
+        function getActiveNpcs() { return npcDefinitions.filter(n => n.pastOnly ? currentTime === 'past' : true); }
+
+        // ============ INIMIGOS DE MAPA ============
+        function spawnMapEnemies() {
+            mapEnemies = [];
+            const positions = [
+                { x: 8, y: 5 }, { x: 12, y: 8 }, { x: 18, y: 9 }, { x: 20, y: 12 }, { x: 6, y: 11 }, { x: 15, y: 14 }, { x: 10, y: 16 }
+            ];
+            for (const pos of positions) {
+                if (Math.random() < 0.7 || currentTime === 'present') {
+                    const type = Math.random() < 0.3 ? 1 : 0;
+                    mapEnemies.push({
+                        x: pos.x * TILE_SIZE + TILE_SIZE / 2,
+                        y: pos.y * TILE_SIZE + TILE_SIZE / 2,
+                        type: type,
+                        spriteIndex: enemyTypes[type].spriteIndex,
+                        id: Math.random().toString(36).substr(2, 5),
+                        visible: true,
+                    });
+                }
+            }
+            if (currentTime === 'present') {
+                for (let i = 0; i < 3; i++) {
+                    mapEnemies.push({
+                        x: (5 + Math.floor(Math.random() * 15)) * TILE_SIZE + TILE_SIZE / 2,
+                        y: (5 + Math.floor(Math.random() * 10)) * TILE_SIZE + TILE_SIZE / 2,
+                        type: 0,
+                        spriteIndex: 0,
+                        id: Math.random().toString(36).substr(2, 5),
+                        visible: true,
+                    });
+                }
             }
         }
 
-        function isWalkable(tx, ty) {
-            if (tx < 0 || tx >= MAP_W || ty < 0 || ty >= MAP_H) return false;
-            return [0, 2, 4, 5].includes(tileMap[ty][tx]);
+        function renderMapEnemies() {
+            for (const en of mapEnemies) {
+                if (!en.visible || !enemySheet) continue;
+                const f = getSpriteFrame(enemySheet, en.spriteIndex, SPRITE_W, SPRITE_H, 2);
+                const drawX = en.x - SPRITE_W * ZOOM / 2;
+                const drawY = en.y - SPRITE_H * ZOOM;
+                ctx.drawImage(enemySheet, f.sx, f.sy, f.sw, f.sh, Math.round(drawX), Math.round(drawY), SPRITE_W * ZOOM, SPRITE_H * ZOOM);
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.fillRect(Math.round(en.x - 10), Math.round(en.y + SPRITE_H - 4), 20, 5);
+            }
         }
 
-        function isGrassTile(tx, ty) {
-            return tx >= 0 && tx < MAP_W && ty >= 0 && ty < MAP_H && tileMap[ty][tx] === 4;
+        function checkMapEnemyCollision() {
+            for (let i = mapEnemies.length - 1; i >= 0; i--) {
+                const en = mapEnemies[i];
+                const dx = player.x - en.x, dy = player.y - en.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < TILE_SIZE * 0.8) {
+                    const enemyType = enemyTypes[en.type];
+                    startBattle(enemyType, en);
+                    mapEnemies.splice(i, 1);
+                    return true;
+                }
+            }
+            return false;
         }
 
-        function isRiftTile(tx, ty) {
-            return tx >= 0 && tx < MAP_W && ty >= 0 && ty < MAP_H && tileMap[ty][tx] === 2;
-        }
-
-        function isTailorTile(tx, ty) {
-            return tx >= 0 && tx < MAP_W && ty >= 0 && ty < MAP_H && tileMap[ty][tx] === 5;
-        }
-
-        // ============ NPCs ============
-        const npcDefinitions = [
-            { id: 'master', name: 'Mestre Alfaiate', x: 2, y: 4, spriteIndex: 0, pastOnly: true,
-                dialogues: {
-                    past: [
-                        'Bem-vindo, jovem aprendiz. O destino de todos é tecido na grande tapeçaria.',
-                        'As fendas estão desfiando a realidade. Você deve restaurar os fios.',
-                        'Use a Alfaiataria para criar mantos poderosos. (Pressione C)',
-                        'Cuidado com as criaturas de fios corrompidos nas áreas de grama alta.',
-                    ],
-                    present: ['As ruínas do que fomos... O tear está silencioso agora.'],
-                } },
-            { id: 'citizen', name: 'Cidadã', x: 10, y: 3, spriteIndex: 1, pastOnly: true,
-                dialogues: {
-                    past: [
-                        'A cidade prospera graças ao Tear Cósmico. Os fios do destino nos guiam.',
-                        'Dizem que alguns fios começaram a desfiar perto da fonte antiga...',
-                    ],
-                    present: ['A fonte secou... os fios se romperam.'],
-                } },
-            { id: 'child', name: 'Criança', x: 15, y: 10, spriteIndex: 1, pastOnly: true,
-                dialogues: {
-                    past: ['Eu sonhei com fios dourados! Eles brilhavam como estrelas.',
-                        'O velho alfaiate disse que meus sonhos são fios do destino.'],
-                    present: ['A criança não está mais aqui. Apenas ecos de risos...'],
-                } },
-            { id: 'spirit', name: 'Espírito do Tear', x: 14, y: 13, spriteIndex: 2, pastOnly: false,
-                dialogues: {
-                    past: ['O tempo é um tear, e nós somos os fios. Belo, não?',
-                        'Quando o passado e o presente se entrelaçam, o impossível acontece.'],
-                    present: ['Vejo que você encontrou o caminho entre os tempos.',
-                        'Os fios corrompidos nascem do desespero. Purifique-os.',
-                        'Crie mantos com os tecidos que coletar. Eles o protegerão.'],
-                } },
-        ];
-
-        function getActiveNpcs() {
-            return npcDefinitions.filter(n => n.pastOnly ? currentTime === 'past' : true);
-        }
-
-        // ============ INIMIGOS ============
+        // ============ TIPOS DE INIMIGOS ============
         const enemyTypes = [
-            { name: 'Fio Corrompido', spriteIndex: 0, hp: 50, atk: 8, def: 2, xpReward: 18,
-                threadPattern: [0, 1, 2, 3, 4], drops: { commonThread: 2 }, moveThreads: true },
-            { name: 'Guardião Temporal', spriteIndex: 2, hp: 75, atk: 12, def: 4, xpReward: 32,
-                threadPattern: [2, 6, 8, 12, 16, 20, 24], drops: { corruptedThread: 1, commonThread: 3 },
-                moveThreads: false },
+            { name: 'Fio Corrompido', spriteIndex: 0, hp: 50, atk: 8, def: 2, xpReward: 18, threadPattern: [0, 1, 2, 3, 4], drops: { commonThread: 2 }, moveThreads: true },
+            { name: 'Guardião Temporal', spriteIndex: 2, hp: 75, atk: 12, def: 4, xpReward: 32, threadPattern: [2, 6, 8, 12, 16, 20, 24], drops: { corruptedThread: 1, commonThread: 3 }, moveThreads: false },
         ];
 
-        function getEnemyByZone() {
-            return Math.random() < 0.3 ? enemyTypes[1] : enemyTypes[0];
-        }
+        function getEnemyByZone() { return Math.random() < 0.3 ? enemyTypes[1] : enemyTypes[0]; }
 
         // ============ RECEITAS ============
         const recipes = [
-            { id: 'seda_estelar', name: 'Manto de Seda Estelar', desc: '+20% esquiva',
-                cost: { commonThread: 4, starSilk: 2 }, effect: 'dodge', value: 0.2 },
-            { id: 'tecelao', name: 'Manto do Tecelão', desc: '+10% dano',
-                cost: { commonThread: 5, timeThread: 1 }, effect: 'damage', value: 0.1 },
-            { id: 'sombras', name: 'Manto das Sombras', desc: '+25% fuga',
-                cost: { commonThread: 3, corruptedThread: 1 }, effect: 'flee', value: 0.25 },
-            { id: 'aurora', name: 'Manto da Aurora', desc: 'Regenera 3 HP/turno',
-                cost: { commonThread: 6, starSilk: 1, timeThread: 1 }, effect: 'regen', value: 3 },
+            { id: 'seda_estelar', name: 'Manto de Seda Estelar', desc: '+20% esquiva', cost: { commonThread: 4, starSilk: 2 }, effect: 'dodge', value: 0.2 },
+            { id: 'tecelao', name: 'Manto do Tecelão', desc: '+10% dano', cost: { commonThread: 5, timeThread: 1 }, effect: 'damage', value: 0.1 },
+            { id: 'sombras', name: 'Manto das Sombras', desc: '+25% fuga', cost: { commonThread: 3, corruptedThread: 1 }, effect: 'flee', value: 0.25 },
+            { id: 'aurora', name: 'Manto da Aurora', desc: 'Regenera 3 HP/turno', cost: { commonThread: 6, starSilk: 1, timeThread: 1 }, effect: 'regen', value: 3 },
         ];
 
         // ============ PARTÍCULAS ============
         function spawnParticles(x, y, color, count = 8, spread = 20) {
             for (let i = 0; i < count; i++) {
                 particles.push({
-                    x: x + (Math.random() - 0.5) * spread,
-                    y: y + (Math.random() - 0.5) * spread,
-                    vx: (Math.random() - 0.5) * 1.5,
-                    vy: (Math.random() - 0.5) * 1.5 - 0.5,
-                    life: 30 + Math.random() * 30,
-                    maxLife: 60,
-                    color: color,
-                    size: 2 + Math.random() * 3,
+                    x: x + (Math.random() - 0.5) * spread, y: y + (Math.random() - 0.5) * spread,
+                    vx: (Math.random() - 0.5) * 1.5, vy: (Math.random() - 0.5) * 1.5 - 0.5,
+                    life: 30 + Math.random() * 30, maxLife: 60, color: color, size: 2 + Math.random() * 3,
                 });
             }
         }
-
         function updateParticles() {
             for (let i = particles.length - 1; i >= 0; i--) {
                 const p = particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += 0.02;
-                p.life--;
+                p.x += p.vx; p.y += p.vy; p.vy += 0.02; p.life--;
                 if (p.life <= 0) particles.splice(i, 1);
             }
         }
-
         function drawParticles() {
             for (const p of particles) {
                 ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
@@ -1192,7 +631,7 @@
             ctx.globalAlpha = 1;
         }
 
-        // ============ DIÁLOGO (corrigido) ============
+        // ============ DIÁLOGO ============
         function startDialog(lines, name) {
             if (dialogLock || lines.length === 0) return;
             dialogLock = true;
@@ -1201,50 +640,34 @@
             document.getElementById('dialog-box').classList.remove('hidden');
             updateDialogUI();
         }
-
         function updateDialogUI() {
             if (!activeDialog) return;
             document.getElementById('dialog-name').textContent = activeDialog.name;
             document.getElementById('dialog-text').textContent = dialogQueue[activeDialog.lineIndex];
         }
-
         function advanceDialog() {
             if (!activeDialog) return;
             activeDialog.lineIndex++;
             if (activeDialog.lineIndex >= dialogQueue.length) {
-                activeDialog = null;
-                dialogQueue = [];
-                dialogLock = false;
+                activeDialog = null; dialogQueue = []; dialogLock = false;
                 document.getElementById('dialog-box').classList.add('hidden');
                 if (gameState === 'exploring') updateHUD();
-            } else {
-                updateDialogUI();
-            }
+            } else updateDialogUI();
         }
-
-        // Clique na caixa de diálogo
         document.getElementById('dialog-box').addEventListener('click', advanceDialog);
 
-        // ============ COMBATE APRIMORADO ============
-        function startBattle(enemyType) {
+        // ============ COMBATE (com animação) ============
+        function startBattle(enemyType, mapEnemyRef = null) {
             const enemy = {
                 ...enemyType,
-                hp: enemyType.hp,
-                maxHp: enemyType.hp,
-                def: enemyType.def,
+                hp: enemyType.hp, maxHp: enemyType.hp, def: enemyType.def,
                 threads: generateThreadPattern(enemyType.threadPattern),
-                stunned: false,
-                moveThreads: enemyType.moveThreads,
-                turnCounter: 0,
+                stunned: false, moveThreads: enemyType.moveThreads, turnCounter: 0,
             };
             battleState = {
-                enemy: enemy,
-                turn: 'player',
-                log: ['A batalha começa...'],
-                selectedCells: [],
-                playerHp: player.hp,
-                playerMp: player.mp,
-                defending: false,
+                enemy, turn: 'player', log: ['A batalha começa...'],
+                selectedCells: [], playerHp: player.hp, playerMp: player.mp, defending: false,
+                animating: false, mapEnemyRef: mapEnemyRef,
             };
             gameState = 'battling';
             document.getElementById('battle-overlay').classList.remove('hidden');
@@ -1254,24 +677,21 @@
             renderThreadGrid();
             updateBattleLog('Um ' + enemy.name + ' surge dos fios corrompidos!');
             updateBattleStats();
+            battleAnimCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
         }
 
-        function generateThreadPattern(basePattern) {
-            const threads = new Set(basePattern);
-            while (threads.size < basePattern.length + 2) {
-                threads.add(Math.floor(Math.random() * 25));
-            }
+        function generateThreadPattern(base) {
+            const threads = new Set(base);
+            while (threads.size < base.length + 2) threads.add(Math.floor(Math.random() * 25));
             return Array.from(threads).slice(0, 7);
         }
 
         function renderBattleEnemySprite() {
             if (!battleState) return;
-            const enemyCanvas = document.getElementById('battle-enemy-canvas');
-            const eCtx = enemyCanvas.getContext('2d');
-            eCtx.imageSmoothingEnabled = false;
+            const c = document.getElementById('battle-enemy-canvas');
+            const eCtx = c.getContext('2d');
             eCtx.clearRect(0, 0, 72, 72);
-            eCtx.fillStyle = '#1a1a2e';
-            eCtx.fillRect(0, 0, 72, 72);
+            eCtx.fillStyle = '#1a1a2e'; eCtx.fillRect(0, 0, 72, 72);
             const f = getSpriteFrame(enemySheet, battleState.enemy.spriteIndex, SPRITE_W, SPRITE_H, 2);
             eCtx.drawImage(enemySheet, f.sx, f.sy, f.sw, f.sh, 4, 4, 64, 64);
         }
@@ -1289,12 +709,11 @@
                 if (battleState.selectedCells.includes(i)) cell.classList.add('active');
                 cell.textContent = threads.includes(i) ? '✦' : '';
                 cell.addEventListener('click', () => {
-                    if (battleState.turn === 'player' && !battleState.enemy.stunned) {
+                    if (battleState.turn === 'player' && !battleState.enemy.stunned && !battleState.animating) {
                         const idx = battleState.selectedCells.indexOf(i);
                         if (idx > -1) battleState.selectedCells.splice(idx, 1);
                         else if (battleState.selectedCells.length < 5) battleState.selectedCells.push(i);
-                        renderThreadGrid();
-                        updateBattleUI();
+                        renderThreadGrid(); updateBattleUI();
                     }
                 });
                 grid.appendChild(cell);
@@ -1305,8 +724,7 @@
             if (!battleState) return;
             document.getElementById('battle-player-hp').textContent = battleState.playerHp + '/' + player.maxHp;
             document.getElementById('battle-player-mp').textContent = battleState.playerMp + '/' + player.maxMp;
-            document.getElementById('battle-enemy-hp').textContent =
-                battleState.enemy.name + ' HP: ' + battleState.enemy.hp + '/' + battleState.enemy.maxHp;
+            document.getElementById('battle-enemy-hp').textContent = battleState.enemy.name + ' HP: ' + battleState.enemy.hp + '/' + battleState.enemy.maxHp;
         }
 
         function updateBattleLog(msg) {
@@ -1322,80 +740,112 @@
         }
 
         function clearSelection() {
-            if (!battleState) return;
+            if (!battleState || battleState.animating) return;
             battleState.selectedCells = [];
-            renderThreadGrid();
-            updateBattleUI();
+            renderThreadGrid(); updateBattleUI();
+        }
+
+        // ----- Animações de batalha -----
+        function playAttackAnimation(type, callback) {
+            if (!battleState) return;
+            battleState.animating = true;
+            battleAnimCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+            const enemyX = 400, enemyY = 150;
+            const playerX = 200, playerY = 400;
+            const duration = 600;
+            const startTime = performance.now();
+
+            function animate(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                battleAnimCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+
+                if (type === 'player_attack') {
+                    const pFrame = getSpriteFrame(playerSheet, 6, SPRITE_W, SPRITE_H, 3);
+                    battleAnimCtx.drawImage(playerSheet, pFrame.sx, pFrame.sy, SPRITE_W, SPRITE_H, playerX - SPRITE_W, playerY, SPRITE_W * ZOOM, SPRITE_H * ZOOM);
+                    const eFrame = getSpriteFrame(enemySheet, battleState.enemy.spriteIndex, SPRITE_W, SPRITE_H, 2);
+                    battleAnimCtx.drawImage(enemySheet, eFrame.sx, eFrame.sy, SPRITE_W, SPRITE_H, enemyX - SPRITE_W, enemyY, SPRITE_W * ZOOM, SPRITE_H * ZOOM);
+                    const slashX = playerX + (enemyX - playerX) * progress;
+                    battleAnimCtx.strokeStyle = '#fff'; battleAnimCtx.lineWidth = 4;
+                    battleAnimCtx.beginPath(); battleAnimCtx.moveTo(playerX + 20, playerY + 20); battleAnimCtx.lineTo(slashX, enemyY + 20); battleAnimCtx.stroke();
+                    if (progress > 0.7) {
+                        battleAnimCtx.fillStyle = '#f1c40f'; battleAnimCtx.beginPath();
+                        battleAnimCtx.arc(enemyX, enemyY + 30, 20 * (progress - 0.7) * 5, 0, Math.PI * 2); battleAnimCtx.fill();
+                    }
+                } else if (type === 'enemy_attack') {
+                    const eFrame = getSpriteFrame(enemySheet, battleState.enemy.spriteIndex, SPRITE_W, SPRITE_H, 2);
+                    battleAnimCtx.drawImage(enemySheet, eFrame.sx, eFrame.sy, SPRITE_W, SPRITE_H, enemyX - SPRITE_W, enemyY, SPRITE_W * ZOOM, SPRITE_H * ZOOM);
+                    const pFrame = getSpriteFrame(playerSheet, 0, SPRITE_W, SPRITE_H, 3);
+                    battleAnimCtx.drawImage(playerSheet, pFrame.sx, pFrame.sy, SPRITE_W, SPRITE_H, playerX - SPRITE_W, playerY, SPRITE_W * ZOOM, SPRITE_H * ZOOM);
+                    const slashX = enemyX - (enemyX - playerX) * progress;
+                    battleAnimCtx.strokeStyle = '#e74c3c'; battleAnimCtx.lineWidth = 4;
+                    battleAnimCtx.beginPath(); battleAnimCtx.moveTo(enemyX - 20, enemyY + 20); battleAnimCtx.lineTo(slashX, playerY + 20); battleAnimCtx.stroke();
+                    if (progress > 0.7) {
+                        battleAnimCtx.fillStyle = '#e74c3c'; battleAnimCtx.beginPath();
+                        battleAnimCtx.arc(playerX, playerY + 30, 15 * (progress - 0.7) * 5, 0, Math.PI * 2); battleAnimCtx.fill();
+                    }
+                } else if (type === 'magic') {
+                    battleAnimCtx.fillStyle = '#9b59b6'; battleAnimCtx.beginPath();
+                    battleAnimCtx.arc(enemyX, enemyY, 30 * progress, 0, Math.PI * 2); battleAnimCtx.fill();
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    battleAnimCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+                    battleState.animating = false;
+                    callback();
+                }
+            }
+            requestAnimationFrame(animate);
         }
 
         function playerAttack(patternType) {
-            if (!battleState || battleState.turn !== 'player') return;
-            if (battleState.enemy.stunned) {
-                updateBattleLog('O inimigo está atordoado!');
-                return;
-            }
+            if (!battleState || battleState.turn !== 'player' || battleState.animating) return;
+            if (battleState.enemy.stunned) { updateBattleLog('O inimigo está atordoado!'); return; }
             const enemy = battleState.enemy;
             let hitCells = [];
             if (patternType === 'selected') {
                 hitCells = [...battleState.selectedCells];
             } else {
-                const col = Math.floor(Math.random() * 5);
-                const row = Math.floor(Math.random() * 5);
+                const col = Math.floor(Math.random() * 5), row = Math.floor(Math.random() * 5);
                 switch (patternType) {
-                    case 'line':
-                        hitCells = Array.from({ length: 5 }, (_, i) => row * 5 + i);
-                        break;
-                    case 'column':
-                        hitCells = Array.from({ length: 5 }, (_, i) => i * 5 + col);
-                        break;
-                    case 'cross':
-                        hitCells = [...Array.from({ length: 5 }, (_, i) => 2 * 5 + i), ...Array.from({ length: 5 }, (
-                            _, i) => i * 5 + 2)];
-                        break;
-                    case 'diagonal':
-                        hitCells = [...Array.from({ length: 5 }, (_, i) => i * 5 + i), ...Array.from({ length: 5 }, (
-                            _, i) => i * 5 + (4 - i))];
-                        break;
+                    case 'line': hitCells = Array.from({ length: 5 }, (_, i) => row * 5 + i); break;
+                    case 'column': hitCells = Array.from({ length: 5 }, (_, i) => i * 5 + col); break;
+                    case 'cross': hitCells = [...Array.from({ length: 5 }, (_, i) => 2 * 5 + i), ...Array.from({ length: 5 }, (_, i) => i * 5 + 2)]; break;
+                    case 'diagonal': hitCells = [...Array.from({ length: 5 }, (_, i) => i * 5 + i), ...Array.from({ length: 5 }, (_, i) => i * 5 + (4 - i))]; break;
                 }
-                // Adiciona células selecionadas (até 5)
-                for (const c of battleState.selectedCells) {
-                    if (!hitCells.includes(c)) hitCells.push(c);
-                }
+                for (const c of battleState.selectedCells) if (!hitCells.includes(c)) hitCells.push(c);
             }
             hitCells = [...new Set(hitCells)];
             const threadsHit = hitCells.filter(c => enemy.threads.includes(c));
             const baseDamage = 12 + player.level * 2;
             let multiplier = 1;
-            if (threadsHit.length > 0) {
-                multiplier = 1 + threadsHit.length * 0.3;
-            }
+            if (threadsHit.length > 0) multiplier = 1 + threadsHit.length * 0.3;
             if (player.equippedCloak === 'tecelao') multiplier *= 1.1;
             if (patternType === 'selected' && threadsHit.length === 0) multiplier *= 0.8;
             let damage = Math.max(1, Math.floor(baseDamage * multiplier) - enemy.def);
-            enemy.hp = Math.max(0, enemy.hp - damage);
-            updateBattleLog('🧵 Atingiu ' + threadsHit.length + ' fio(s)! Dano: ' + damage);
-            spawnParticles(400, 250, '#e74c3c', 8, 30);
-            if (threadsHit.length === enemy.threads.length && enemy.threads.length > 0) {
-                enemy.stunned = true;
-                updateBattleLog('✨ TODOS os fios! Inimigo atordoado!');
-            }
             battleState.selectedCells = [];
-            if (enemy.hp <= 0) {
-                endBattle(true);
-                return;
-            }
-            battleState.turn = 'enemy';
-            battleState.defending = false;
-            updateBattleUI();
-            setTimeout(enemyTurn, 800);
+
+            playAttackAnimation('player_attack', () => {
+                enemy.hp = Math.max(0, enemy.hp - damage);
+                updateBattleLog('🧵 Atingiu ' + threadsHit.length + ' fio(s)! Dano: ' + damage);
+                spawnParticles(400, 250, '#e74c3c', 8, 30);
+                if (threadsHit.length === enemy.threads.length && enemy.threads.length > 0) {
+                    enemy.stunned = true;
+                    updateBattleLog('✨ TODOS os fios! Inimigo atordoado!');
+                }
+                if (enemy.hp <= 0) { endBattle(true); return; }
+                battleState.turn = 'enemy';
+                battleState.defending = false;
+                updateBattleUI();
+                setTimeout(enemyTurn, 500);
+            });
         }
 
         function playerMagic() {
-            if (!battleState || battleState.turn !== 'player') return;
-            if (battleState.playerMp < 10) {
-                updateBattleLog('MP insuficiente!');
-                return;
-            }
+            if (!battleState || battleState.turn !== 'player' || battleState.animating) return;
+            if (battleState.playerMp < 10) { updateBattleLog('MP insuficiente!'); return; }
             battleState.playerMp -= 10;
             const enemy = battleState.enemy;
             const threads = enemy.threads;
@@ -1403,22 +853,22 @@
             const threadsHit = hitCells.filter(c => threads.includes(c));
             const baseDamage = 24 + player.level * 3;
             let damage = Math.max(5, Math.floor(baseDamage * (1 + threadsHit.length * 0.25)) - enemy.def);
-            enemy.hp = Math.max(0, enemy.hp - damage);
-            updateBattleLog('✨ Magia do Tear: ' + damage + ' de dano!');
-            spawnParticles(400, 250, '#9B59B6', 16, 50);
-            battleState.selectedCells = [];
-            if (enemy.hp <= 0) {
-                endBattle(true);
-                return;
-            }
-            battleState.turn = 'enemy';
-            battleState.defending = false;
-            updateBattleUI();
-            setTimeout(enemyTurn, 800);
+
+            playAttackAnimation('magic', () => {
+                enemy.hp = Math.max(0, enemy.hp - damage);
+                updateBattleLog('✨ Magia do Tear: ' + damage + ' de dano!');
+                spawnParticles(400, 250, '#9B59B6', 16, 50);
+                battleState.selectedCells = [];
+                if (enemy.hp <= 0) { endBattle(true); return; }
+                battleState.turn = 'enemy';
+                battleState.defending = false;
+                updateBattleUI();
+                setTimeout(enemyTurn, 500);
+            });
         }
 
         function playerUseItem() {
-            if (!battleState || battleState.turn !== 'player') return;
+            if (!battleState || battleState.turn !== 'player' || battleState.animating) return;
             if (player.inventory.potions > 0) {
                 player.inventory.potions--;
                 const heal = 35 + player.level * 3;
@@ -1427,14 +877,12 @@
                 battleState.turn = 'enemy';
                 battleState.defending = false;
                 updateBattleUI();
-                setTimeout(enemyTurn, 700);
-            } else {
-                updateBattleLog('Sem poções!');
-            }
+                setTimeout(enemyTurn, 600);
+            } else updateBattleLog('Sem poções!');
         }
 
         function playerDefend() {
-            if (!battleState || battleState.turn !== 'player') return;
+            if (!battleState || battleState.turn !== 'player' || battleState.animating) return;
             battleState.defending = true;
             battleState.turn = 'enemy';
             updateBattleLog('🛡️ Você assume posição defensiva.');
@@ -1443,10 +891,9 @@
         }
 
         function playerConcentrate() {
-            if (!battleState || battleState.turn !== 'player') return;
-            const mpGain = 15;
-            battleState.playerMp = Math.min(player.maxMp, battleState.playerMp + mpGain);
-            updateBattleLog('🧘 Concentração: +' + mpGain + ' MP');
+            if (!battleState || battleState.turn !== 'player' || battleState.animating) return;
+            battleState.playerMp = Math.min(player.maxMp, battleState.playerMp + 15);
+            updateBattleLog('🧘 Concentração: +15 MP');
             battleState.turn = 'enemy';
             battleState.defending = false;
             updateBattleUI();
@@ -1454,7 +901,7 @@
         }
 
         function playerFlee() {
-            if (!battleState || battleState.turn !== 'player') return;
+            if (!battleState || battleState.turn !== 'player' || battleState.animating) return;
             let fleeChance = 0.4;
             if (player.equippedCloak === 'sombras') fleeChance += 0.25;
             if (Math.random() < fleeChance) {
@@ -1464,7 +911,7 @@
                 updateBattleLog('Falha na fuga!');
                 battleState.turn = 'enemy';
                 battleState.defending = false;
-                setTimeout(enemyTurn, 700);
+                setTimeout(enemyTurn, 600);
             }
             updateBattleUI();
         }
@@ -1473,51 +920,40 @@
             if (!battleState || battleState.turn !== 'enemy') return;
             const enemy = battleState.enemy;
             enemy.turnCounter++;
-            // Mover fios (se aplicável)
             if (enemy.moveThreads && enemy.turnCounter % 2 === 0) {
-                const newThreads = [];
                 const base = enemyTypes.find(e => e.name === enemy.name)?.threadPattern || [0, 1, 2, 3, 4];
-                const extra = Math.floor(Math.random() * 25);
-                const set = new Set(base);
-                set.add(extra);
-                while (set.size < 7) set.add(Math.floor(Math.random() * 25));
-                enemy.threads = Array.from(set).slice(0, 7);
+                const newSet = new Set(base); newSet.add(Math.floor(Math.random() * 25));
+                while (newSet.size < 7) newSet.add(Math.floor(Math.random() * 25));
+                enemy.threads = Array.from(newSet).slice(0, 7);
                 updateBattleLog('🌀 Os fios se moveram!');
                 renderThreadGrid();
             }
             if (enemy.stunned) {
                 enemy.stunned = false;
                 updateBattleLog('O inimigo se recupera.');
-                battleState.turn = 'player';
-                battleState.defending = false;
-                updateBattleUI();
-                return;
+                battleState.turn = 'player'; battleState.defending = false; updateBattleUI(); return;
             }
             let enemyDamage = enemy.atk;
             if (battleState.defending) enemyDamage = Math.floor(enemyDamage * 0.4);
             if (player.equippedCloak === 'seda_estelar' && Math.random() < 0.2) {
                 updateBattleLog('🌟 Esquiva do manto!');
+                battleState.turn = 'player'; battleState.defending = false; updateBattleUI(); return;
+            }
+            enemyDamage = Math.max(1, enemyDamage - 1);
+
+            playAttackAnimation('enemy_attack', () => {
+                battleState.playerHp = Math.max(0, battleState.playerHp - enemyDamage);
+                updateBattleLog('💢 ' + enemy.name + ' causou ' + enemyDamage + ' de dano.');
+                spawnParticles(200, 200, '#8e44ad', 6, 20);
+                if (battleState.playerHp <= 0) { endBattle(false); return; }
+                if (player.equippedCloak === 'aurora') {
+                    battleState.playerHp = Math.min(player.maxHp, battleState.playerHp + 3);
+                    updateBattleLog('🌅 Aurora: +3 HP');
+                }
                 battleState.turn = 'player';
                 battleState.defending = false;
                 updateBattleUI();
-                return;
-            }
-            enemyDamage = Math.max(1, enemyDamage - 1);
-            battleState.playerHp = Math.max(0, battleState.playerHp - enemyDamage);
-            updateBattleLog('💢 ' + enemy.name + ' causou ' + enemyDamage + ' de dano.');
-            spawnParticles(200, 200, '#8e44ad', 6, 20);
-            if (battleState.playerHp <= 0) {
-                endBattle(false);
-                return;
-            }
-            if (player.equippedCloak === 'aurora') {
-                const regen = 3;
-                battleState.playerHp = Math.min(player.maxHp, battleState.playerHp + regen);
-                updateBattleLog('🌅 Aurora: +' + regen + ' HP');
-            }
-            battleState.turn = 'player';
-            battleState.defending = false;
-            updateBattleUI();
+            });
         }
 
         function endBattle(victory) {
@@ -1543,16 +979,15 @@
             gameState = 'exploring';
             document.getElementById('battle-overlay').classList.add('hidden');
             updateHUD();
+            spawnMapEnemies();
         }
 
         function checkLevelUp() {
             while (player.xp >= player.xpToNext) {
                 player.xp -= player.xpToNext;
                 player.level++;
-                player.maxHp += 10;
-                player.hp = player.maxHp;
-                player.maxMp += 5;
-                player.mp = player.maxMp;
+                player.maxHp += 10; player.hp = player.maxHp;
+                player.maxMp += 5; player.mp = player.maxMp;
                 player.xpToNext = Math.floor(player.xpToNext * 1.5);
                 updateBattleLog('⭐ Nível ' + player.level + '!');
             }
@@ -1577,7 +1012,6 @@
                 updateHUD();
             }
         }
-
         function renderCraftingRecipes() {
             const container = document.getElementById('crafting-recipes');
             container.innerHTML = '';
@@ -1594,37 +1028,22 @@
                 craftBtn.className = 'recipe-craft';
                 craftBtn.textContent = 'Criar';
                 craftBtn.addEventListener('click', () => craftRecipe(recipe.id));
-                div.appendChild(nameSpan);
-                div.appendChild(costSpan);
-                div.appendChild(craftBtn);
+                div.appendChild(nameSpan); div.appendChild(costSpan); div.appendChild(craftBtn);
                 container.appendChild(div);
             }
             const invDiv = document.createElement('div');
-            invDiv.style.marginTop = '8px';
-            invDiv.style.padding = '6px';
-            invDiv.style.background = 'rgba(0,0,0,0.4)';
-            invDiv.style.borderRadius = '4px';
-            invDiv.style.fontSize = '6px';
-            invDiv.style.color = '#aaa';
-            invDiv.innerHTML = 'Inventário: ' + Object.entries(player.inventory)
-                .filter(([k, v]) => v > 0 && k !== 'potions' && k !== 'ethers')
-                .map(([k, v]) => v + 'x ' + k).join(' | ') +
-                ' | 🧪 Poções: ' + player.inventory.potions + ' | 🔷 Éter: ' + player.inventory.ethers;
+            invDiv.style.marginTop = '8px'; invDiv.style.padding = '6px'; invDiv.style.background = 'rgba(0,0,0,0.4)';
+            invDiv.style.borderRadius = '4px'; invDiv.style.fontSize = '6px'; invDiv.style.color = '#aaa';
+            invDiv.innerHTML = 'Inventário: ' + Object.entries(player.inventory).filter(([k, v]) => v > 0 && k !== 'potions' && k !== 'ethers').map(([k, v]) => v + 'x ' + k).join(' | ') + ' | 🧪 Poções: ' + player.inventory.potions + ' | 🔷 Éter: ' + player.inventory.ethers;
             container.appendChild(invDiv);
         }
-
         function craftRecipe(recipeId) {
             const recipe = recipes.find(r => r.id === recipeId);
             if (!recipe) return;
             for (const [item, qty] of Object.entries(recipe.cost)) {
-                if ((player.inventory[item] || 0) < qty) {
-                    alert('Materiais insuficientes!');
-                    return;
-                }
+                if ((player.inventory[item] || 0) < qty) { alert('Materiais insuficientes!'); return; }
             }
-            for (const [item, qty] of Object.entries(recipe.cost)) {
-                player.inventory[item] -= qty;
-            }
+            for (const [item, qty] of Object.entries(recipe.cost)) player.inventory[item] -= qty;
             player.cloaksOwned.push(recipe.id);
             if (!player.equippedCloak) player.equippedCloak = recipe.id;
             alert('🧵 ' + recipe.name + ' criado!');
@@ -1639,16 +1058,12 @@
             document.getElementById('hud-hp').style.width = (player.hp / player.maxHp * 100) + '%';
             document.getElementById('hud-mp').style.width = (player.mp / player.maxMp * 100) + '%';
             document.getElementById('hud-xp').style.width = (player.xp / player.xpToNext * 100) + '%';
-            document.getElementById('hud-time').textContent = currentTime === 'past' ? '⏳ Passado' :
-                '🌙 Presente (Ruínas)';
+            document.getElementById('hud-time').textContent = currentTime === 'past' ? '⏳ Passado' : '🌙 Presente (Ruínas)';
             document.getElementById('hud-time').style.color = currentTime === 'past' ? '#8e44ad' : '#e74c3c';
         }
 
         // ============ RENDERIZAÇÃO ============
-        function getTileName(t) {
-            return ['floor', 'wall', 'rift', 'water', 'grass', 'tailor'][t] || 'floor';
-        }
-
+        function getTileName(t) { return ['floor', 'wall', 'rift', 'water', 'grass', 'tailor'][t] || 'floor'; }
         function renderMap() {
             for (let y = 0; y < MAP_H; y++) {
                 for (let x = 0; x < MAP_W; x++) {
@@ -1660,8 +1075,7 @@
             for (let y = 0; y < MAP_H; y++) {
                 for (let x = 0; x < MAP_W; x++) {
                     if (tileMap[y][x] === 2) {
-                        const sx = x * TILE_SIZE,
-                            sy = y * TILE_SIZE;
+                        const sx = x * TILE_SIZE, sy = y * TILE_SIZE;
                         const pulse = Math.sin(Date.now() / 300 + x + y) * 0.3 + 0.7;
                         ctx.fillStyle = 'rgba(142,68,173,' + (pulse * 0.5) + ')';
                         ctx.fillRect(sx + 4, sy + 4, TILE_SIZE - 8, TILE_SIZE - 8);
@@ -1671,7 +1085,6 @@
                 }
             }
         }
-
         function renderPlayer() {
             if (!playerSheet) return;
             const dirIndex = { down: 0, up: 3, left: 6, right: 9 };
@@ -1680,23 +1093,19 @@
             const f = getSpriteFrame(playerSheet, baseFrame + frameOffset, SPRITE_W, SPRITE_H, 3);
             const drawX = player.x - SPRITE_W * ZOOM / 2 + TILE_SIZE / 2;
             const drawY = player.y - SPRITE_H * ZOOM + TILE_SIZE - 4;
-            ctx.drawImage(playerSheet, f.sx, f.sy, f.sw, f.sh, Math.round(drawX), Math.round(drawY), SPRITE_W * ZOOM,
-                SPRITE_H * ZOOM);
+            ctx.drawImage(playerSheet, f.sx, f.sy, f.sw, f.sh, Math.round(drawX), Math.round(drawY), SPRITE_W * ZOOM, SPRITE_H * ZOOM);
             ctx.fillStyle = 'rgba(0,0,0,0.25)';
             ctx.fillRect(Math.round(player.x - 8), Math.round(player.y + TILE_SIZE - 4), 16, 4);
         }
-
         function renderNpcs() {
             const activeNpcs = getActiveNpcs();
             for (const npc of activeNpcs) {
                 if (!npcSheet) continue;
                 const f = getSpriteFrame(npcSheet, npc.spriteIndex, SPRITE_W, SPRITE_H, 3);
-                const nx = npc.x * TILE_SIZE,
-                    ny = npc.y * TILE_SIZE;
+                const nx = npc.x * TILE_SIZE, ny = npc.y * TILE_SIZE;
                 const drawX = nx - SPRITE_W * ZOOM / 2 + TILE_SIZE / 2;
                 const drawY = ny - SPRITE_H * ZOOM + TILE_SIZE - 4;
-                ctx.drawImage(npcSheet, f.sx, f.sy, f.sw, f.sh, Math.round(drawX), Math.round(drawY), SPRITE_W * ZOOM,
-                    SPRITE_H * ZOOM);
+                ctx.drawImage(npcSheet, f.sx, f.sy, f.sw, f.sh, Math.round(drawX), Math.round(drawY), SPRITE_W * ZOOM, SPRITE_H * ZOOM);
                 if (isNearNpc(npc)) {
                     ctx.fillStyle = 'rgba(212,160,23,0.8)';
                     ctx.font = '10px monospace';
@@ -1705,16 +1114,12 @@
                 }
             }
         }
-
         function isNearNpc(npc) {
-            const px = Math.floor(player.x / TILE_SIZE),
-                py = Math.floor(player.y / TILE_SIZE);
+            const px = Math.floor(player.x / TILE_SIZE), py = Math.floor(player.y / TILE_SIZE);
             return Math.abs(px - npc.x) <= 1 && Math.abs(py - npc.y) <= 1;
         }
-
         function renderLighting() {
-            const gradient = ctx.createRadialGradient(player.x + TILE_SIZE / 2, player.y + TILE_SIZE / 2, 40, player.x +
-                TILE_SIZE / 2, player.y + TILE_SIZE / 2, 260);
+            const gradient = ctx.createRadialGradient(player.x + TILE_SIZE / 2, player.y + TILE_SIZE / 2, 40, player.x + TILE_SIZE / 2, player.y + TILE_SIZE / 2, 260);
             const darkness = currentTime === 'present' ? 0.45 : 0.2;
             gradient.addColorStop(0, 'rgba(0,0,0,0)');
             gradient.addColorStop(0.5, 'rgba(0,0,0,' + (darkness * 0.4) + ')');
@@ -1726,14 +1131,10 @@
         // ============ INTERAÇÃO ============
         function handleInteraction() {
             if (dialogLock || activeDialog) return;
-            const px = Math.floor(player.x / TILE_SIZE),
-                py = Math.floor(player.y / TILE_SIZE);
+            const px = Math.floor(player.x / TILE_SIZE), py = Math.floor(player.y / TILE_SIZE);
             for (let dy = -1; dy <= 1; dy++) {
                 for (let dx = -1; dx <= 1; dx++) {
-                    if (isRiftTile(px + dx, py + dy)) {
-                        toggleTime();
-                        return;
-                    }
+                    if (isRiftTile(px + dx, py + dy)) { toggleTime(); return; }
                 }
             }
             const activeNpcs = getActiveNpcs();
@@ -1747,29 +1148,24 @@
                 startDialog(['A Alfaiataria está ao seu alcance. Pressione C para criar mantos.'], 'Alfaiataria');
             }
         }
-
         function toggleTime() {
             if (dialogLock || activeDialog) return;
             currentTime = currentTime === 'past' ? 'present' : 'past';
             spawnParticles(player.x, player.y, '#8e44ad', 30, 60);
             spawnParticles(player.x, player.y, '#d4a017', 15, 40);
             updateHUD();
+            spawnMapEnemies();
             if (currentTime === 'present') {
-                startDialog(['O tempo se distorce... As ruínas emergem ao seu redor.',
-                        'Os ecos do passado sussurram entre os escombros.'
-                    ], 'Fenda Temporal');
+                startDialog(['O tempo se distorce... As ruínas emergem ao seu redor.', 'Os ecos do passado sussurram entre os escombros.'], 'Fenda Temporal');
             } else {
-                startDialog(['A luz do passado retorna. A cidade prospera novamente.',
-                        'Os fios do destino brilham com esperança.'
-                    ], 'Fenda Temporal');
+                startDialog(['A luz do passado retorna. A cidade prospera novamente.', 'Os fios do destino brilham com esperança.'], 'Fenda Temporal');
             }
         }
 
         // ============ MOVIMENTO ============
         function updatePlayer(deltaTime) {
             if (dialogLock || activeDialog || gameState !== 'exploring') return;
-            let dx = 0,
-                dy = 0;
+            let dx = 0, dy = 0;
             if (keys['w'] || keys['arrowup']) dy = -1;
             if (keys['s'] || keys['arrowdown']) dy = 1;
             if (keys['a'] || keys['arrowleft']) dx = -1;
@@ -1781,32 +1177,23 @@
                 else if (dy > 0) player.dir = 'down';
                 else if (dy < 0) player.dir = 'up';
                 const speed = 2.5;
-                const newX = player.x + dx * speed,
-                    newY = player.y + dy * speed;
+                const newX = player.x + dx * speed, newY = player.y + dy * speed;
                 const margin = 6;
                 const checkX = Math.floor((newX + (dx > 0 ? margin : -margin)) / TILE_SIZE);
                 const checkY = Math.floor((newY + (dy > 0 ? margin : -margin)) / TILE_SIZE);
                 if (dx !== 0 && isWalkable(checkX, Math.floor(player.y / TILE_SIZE))) player.x = newX;
                 if (dy !== 0 && isWalkable(Math.floor(player.x / TILE_SIZE), checkY)) player.y = newY;
-                const tileX = Math.floor(player.x / TILE_SIZE),
-                    tileY = Math.floor(player.y / TILE_SIZE);
+                if (checkMapEnemyCollision()) return;
+                const tileX = Math.floor(player.x / TILE_SIZE), tileY = Math.floor(player.y / TILE_SIZE);
                 if (isGrassTile(tileX, tileY) && Math.random() < encounterChance) {
-                    const enemy = getEnemyByZone();
-                    startBattle(enemy);
+                    startBattle(getEnemyByZone());
                     return;
                 }
                 player.moveTimer += deltaTime;
-                if (player.moveTimer > 180) {
-                    player.frame = (player.frame + 1) % 2;
-                    player.moveTimer = 0;
-                }
-                if (Math.random() < 0.15) {
-                    spawnParticles(player.x + (Math.random() - 0.5) * 8, player.y + TILE_SIZE - 2, '#8a7a6a', 1, 4);
-                }
+                if (player.moveTimer > 180) { player.frame = (player.frame + 1) % 2; player.moveTimer = 0; }
+                if (Math.random() < 0.15) spawnParticles(player.x + (Math.random() - 0.5) * 8, player.y + TILE_SIZE - 2, '#8a7a6a', 1, 4);
             } else {
-                player.moving = false;
-                player.frame = 0;
-                player.moveTimer = 0;
+                player.moving = false; player.frame = 0; player.moveTimer = 0;
             }
         }
 
@@ -1819,71 +1206,41 @@
                 document.exitFullscreen();
             }
         }
-        document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
 
-        // ============ INPUT ============
+        // ============ EVENTOS ============
+        document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
         document.addEventListener('keydown', (e) => {
             const key = e.key.toLowerCase();
             keys[key] = true;
             if (key === 'e') {
-                if (activeDialog) {
-                    advanceDialog();
-                } else if (gameState === 'exploring') {
-                    handleInteraction();
-                }
+                if (activeDialog) advanceDialog();
+                else if (gameState === 'exploring') handleInteraction();
             }
-            if (key === 'c') {
-                if (gameState === 'exploring' || gameState === 'crafting') toggleCrafting();
-            }
+            if (key === 'c') { if (gameState === 'exploring' || gameState === 'crafting') toggleCrafting(); }
             if (key === 'escape') {
                 if (gameState === 'crafting') toggleCrafting();
                 else if (document.fullscreenElement) document.exitFullscreen();
             }
             e.preventDefault();
         });
-
-        document.addEventListener('keyup', (e) => {
-            keys[e.key.toLowerCase()] = false;
-        });
+        document.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
 
         document.querySelectorAll('#battle-actions button').forEach(btn => {
             btn.addEventListener('click', () => {
                 if (!battleState || battleState.turn !== 'player') return;
                 const action = btn.dataset.action;
                 switch (action) {
-                    case 'attack-line':
-                        playerAttack('line');
-                        break;
-                    case 'attack-column':
-                        playerAttack('column');
-                        break;
-                    case 'attack-cross':
-                        playerAttack('cross');
-                        break;
-                    case 'attack-diagonal':
-                        playerAttack('diagonal');
-                        break;
-                    case 'attack-selected':
-                        playerAttack('selected');
-                        break;
-                    case 'clear-selection':
-                        clearSelection();
-                        break;
-                    case 'defend':
-                        playerDefend();
-                        break;
-                    case 'concentrate':
-                        playerConcentrate();
-                        break;
-                    case 'magic':
-                        playerMagic();
-                        break;
-                    case 'item':
-                        playerUseItem();
-                        break;
-                    case 'flee':
-                        playerFlee();
-                        break;
+                    case 'attack-line': playerAttack('line'); break;
+                    case 'attack-column': playerAttack('column'); break;
+                    case 'attack-cross': playerAttack('cross'); break;
+                    case 'attack-diagonal': playerAttack('diagonal'); break;
+                    case 'attack-selected': playerAttack('selected'); break;
+                    case 'clear-selection': clearSelection(); break;
+                    case 'defend': playerDefend(); break;
+                    case 'concentrate': playerConcentrate(); break;
+                    case 'magic': playerMagic(); break;
+                    case 'item': playerUseItem(); break;
+                    case 'flee': playerFlee(); break;
                 }
             });
         });
@@ -1894,6 +1251,7 @@
             gameState = 'exploring';
             startIntroDialog();
             updateHUD();
+            spawnMapEnemies();
         });
         document.getElementById('restart-btn').addEventListener('click', () => {
             resetGame();
@@ -1914,50 +1272,37 @@
         function resetGame() {
             player.hp = player.maxHp;
             player.mp = player.maxMp;
-            player.x = 3 * TILE_SIZE;
-            player.y = 8 * TILE_SIZE;
+            player.x = 3 * TILE_SIZE; player.y = 8 * TILE_SIZE;
             player.dir = 'down';
-            player.xp = 0;
-            player.level = 1;
-            player.maxHp = 100;
-            player.maxMp = 50;
-            player.xpToNext = 30;
-            player.inventory = { commonThread: 5, starSilk: 2, timeThread: 1, corruptedThread: 0, potions: 3,
-                ethers: 1 };
-            player.equippedCloak = null;
-            player.cloaksOwned = [];
+            player.xp = 0; player.level = 1;
+            player.maxHp = 100; player.maxMp = 50; player.xpToNext = 30;
+            player.inventory = { commonThread: 5, starSilk: 2, timeThread: 1, corruptedThread: 0, potions: 3, ethers: 1 };
+            player.equippedCloak = null; player.cloaksOwned = [];
             currentTime = 'past';
-            battleState = null;
-            particles = [];
-            dialogQueue = [];
-            activeDialog = null;
-            dialogLock = false;
+            battleState = null; particles = []; dialogQueue = []; activeDialog = null; dialogLock = false;
             document.getElementById('dialog-box').classList.add('hidden');
             document.getElementById('battle-overlay').classList.add('hidden');
             document.getElementById('crafting-panel').classList.add('hidden');
             updateHUD();
+            spawnMapEnemies();
         }
 
         // ============ GAME LOOP ============
         let lastTime = 0;
-
         function gameLoop(timestamp) {
             const deltaTime = timestamp - lastTime;
             lastTime = timestamp;
             ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
-            ctx.fillStyle = '#1a1a2e';
-            ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+            ctx.fillStyle = '#1a1a2e'; ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
             if (gameState === 'title' || gameState === 'gameover') {
-                renderMap();
-                renderLighting();
-                drawParticles();
-                updateParticles();
+                renderMap(); renderLighting(); drawParticles(); updateParticles();
             } else if (gameState === 'exploring') {
                 updatePlayer(deltaTime);
                 updateParticles();
                 renderMap();
                 renderNpcs();
+                renderMapEnemies();
                 renderPlayer();
                 renderLighting();
                 drawParticles();
@@ -1970,37 +1315,25 @@
                 updateParticles();
                 renderMap();
                 renderNpcs();
+                renderMapEnemies();
                 renderPlayer();
                 renderLighting();
                 drawParticles();
             }
-
-            if (gameState === 'exploring' || gameState === 'crafting') {
-                for (let y = 0; y < MAP_H; y++) {
-                    for (let x = 0; x < MAP_W; x++) {
-                        if (tileMap[y][x] === 2) {
-                            const pulse = Math.sin(Date.now() / 400 + x * 0.7 + y * 0.5) * 0.5 + 0.5;
-                            if (pulse > 0.8 && Math.random() < 0.1) {
-                                spawnParticles(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2,
-                                    '#8e44ad', 2, 10);
-                            }
-                        }
-                    }
-                }
-            }
             requestAnimationFrame(gameLoop);
         }
 
+        // ============ INICIALIZAÇÃO ============
         function init() {
             playerSheet = createPlayerSprites();
             enemySheet = createEnemySprites();
             npcSheet = createNpcSprites();
             createTileSheets();
+            spawnMapEnemies();
             updateHUD();
             renderCraftingRecipes();
             requestAnimationFrame(gameLoop);
         }
-
         init();
         console.log('🎮 Echoes of the Loom carregado. Tela cheia disponível!');
     </script>
