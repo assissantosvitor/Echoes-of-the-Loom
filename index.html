@@ -2021,4 +2021,192 @@
                     const tx = px + dx;
                     const ty = py + dy;
                     if (isRiftTile(tx, ty)) {
-                        toggleTime
+                        toggleTime();
+                        return;
+                    }
+                }
+            }
+
+            // Verificar NPCs
+            const activeNpcs = getActiveNpcs();
+            for (const npc of activeNpcs) {
+                if (Math.abs(px - npc.x) <= 1 && Math.abs(py - npc.y) <= 1) {
+                    const lines = npc.dialogues[currentTime] || ['...'];
+                    startDialog(lines, npc.name);
+                    return;
+                }
+            }
+
+            // Alfaiataria
+            if (isTailorTile(px, py)) {
+                startDialog(['A Alfaiataria está ao seu alcance. Pressione C para criar mantos.'],
+                    'Alfaiataria');
+                return;
+            }
+        }
+
+        function toggleTime() {
+            currentTime = currentTime === 'past' ? 'present' : 'past';
+            spawnParticles(player.x, player.y, '#8e44ad', 30, 60);
+            spawnParticles(player.x, player.y, '#d4a017', 15, 40);
+            updateHUD();
+            if (currentTime === 'present') {
+                startDialog(['O tempo se distorce... As ruínas emergem ao seu redor.',
+                        'Os ecos do passado sussurram entre os escombros.'
+                    ], 'Fenda Temporal');
+            } else {
+                startDialog(['A luz do passado retorna. A cidade prospera novamente.',
+                        'Os fios do destino brilham com esperança.'
+                    ], 'Fenda Temporal');
+            }
+        }
+
+        // ============================================================
+        //  MOVIMENTO
+        // ============================================================
+        function updatePlayer(deltaTime) {
+            if (activeDialog || gameState !== 'exploring') return;
+            let dx = 0;
+            let dy = 0;
+            if (keys['w'] || keys['arrowup']) dy = -1;
+            if (keys['s'] || keys['arrowdown']) dy = 1;
+            if (keys['a'] || keys['arrowleft']) dx = -1;
+            if (keys['d'] || keys['arrowright']) dx = 1;
+
+            if (dx !== 0 || dy !== 0) {
+                player.moving = true;
+                if (dx > 0) player.dir = 'right';
+                else if (dx < 0) player.dir = 'left';
+                else if (dy > 0) player.dir = 'down';
+                else if (dy < 0) player.dir = 'up';
+
+                const speed = 2.5;
+                const newX = player.x + dx * speed;
+                const newY = player.y + dy * speed;
+
+                // Colisão
+                const margin = 6;
+                const checkX = Math.floor((newX + (dx > 0 ? margin : -margin)) / TILE_SIZE);
+                const checkY = Math.floor((newY + (dy > 0 ? margin : -margin)) / TILE_SIZE);
+
+                if (dx !== 0 && isWalkable(checkX, Math.floor(player.y / TILE_SIZE))) {
+                    player.x = newX;
+                }
+                if (dy !== 0 && isWalkable(Math.floor(player.x / TILE_SIZE), checkY)) {
+                    player.y = newY;
+                }
+
+                // Encontros aleatórios em grama
+                const tileX = Math.floor(player.x / TILE_SIZE);
+                const tileY = Math.floor(player.y / TILE_SIZE);
+                if (isGrassTile(tileX, tileY) && Math.random() < encounterChance) {
+                    const enemy = getEnemyByZone();
+                    startBattle(enemy);
+                    return;
+                }
+
+                // Animação
+                player.moveTimer += deltaTime;
+                if (player.moveTimer > 180) {
+                    player.frame = (player.frame + 1) % 2;
+                    player.moveTimer = 0;
+                }
+                // Partículas de passos
+                if (Math.random() < 0.15) {
+                    spawnParticles(player.x + (Math.random() - 0.5) * 8, player.y + TILE_SIZE - 2, '#8a7a6a', 1,
+                        4);
+                }
+            } else {
+                player.moving = false;
+                player.frame = 0;
+                player.moveTimer = 0;
+            }
+        }
+
+        // ============================================================
+        //  GAME LOOP
+        // ============================================================
+        let lastTime = 0;
+
+        function gameLoop(timestamp) {
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+
+            // Limpar canvas
+            ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+            if (gameState === 'title') {
+                renderMap();
+                renderLighting();
+                drawParticles();
+                updateParticles();
+            } else if (gameState === 'exploring') {
+                updatePlayer(deltaTime);
+                updateParticles();
+                renderMap();
+                renderNpcs();
+                renderPlayer();
+                renderLighting();
+                drawParticles();
+            } else if (gameState === 'battling') {
+                updateParticles();
+                renderMap();
+                renderLighting();
+                drawParticles();
+                // O overlay HTML cobre o canvas
+            } else if (gameState === 'crafting') {
+                updateParticles();
+                renderMap();
+                renderNpcs();
+                renderPlayer();
+                renderLighting();
+                drawParticles();
+            } else if (gameState === 'gameover') {
+                updateParticles();
+                renderMap();
+                renderLighting();
+                drawParticles();
+            }
+
+            // Rift pulses
+            if (gameState === 'exploring' || gameState === 'crafting') {
+                for (let y = 0; y < MAP_H; y++) {
+                    for (let x = 0; x < MAP_W; x++) {
+                        if (tileMap[y][x] === 2) {
+                            const pulse = Math.sin(Date.now() / 400 + x * 0.7 + y * 0.5) * 0.5 + 0.5;
+                            if (pulse > 0.8 && Math.random() < 0.1) {
+                                spawnParticles(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2,
+                                    '#8e44ad', 2, 10);
+                            }
+                        }
+                    }
+                }
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // ============================================================
+        //  INICIALIZAÇÃO
+        // ============================================================
+        function init() {
+            playerSheet = createPlayerSprites();
+            enemySheet = createEnemySprites();
+            npcSheet = createNpcSprites();
+            createTileSheets();
+            updateHUD();
+            renderCraftingRecipes();
+            requestAnimationFrame(gameLoop);
+        }
+
+        init();
+
+        // Botão de poção também pode ser usado
+        console.log('🎮 Echoes of the Loom — Ecos do Tear carregado!');
+        console.log('📜 Controles: WASD mover | E interagir | C alfaiataria');
+        console.log('🌀 Encontre fendas roxas para viajar entre passado e presente');
+    </script>
+</body>
+</html>
