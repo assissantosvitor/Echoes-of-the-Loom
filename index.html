@@ -364,43 +364,6 @@
             transition: width 0.3s;
         }
 
-        .battle-actions {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            justify-content: center;
-            pointer-events: auto;
-        }
-        .battle-actions button,
-        .crafting-panel button,
-        .title-screen button {
-            font-family: 'Press Start 2P', monospace;
-            font-size: 7px;
-            padding: 8px 12px;
-            background: var(--panel);
-            color: var(--text);
-            border: 2px solid var(--panel-border);
-            border-radius: 4px;
-            cursor: pointer;
-            letter-spacing: 1px;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            pointer-events: auto;
-        }
-        .battle-actions button:hover,
-        .crafting-panel button:hover,
-        .title-screen button:hover {
-            border-color: var(--gold);
-            color: var(--gold);
-            box-shadow: 0 0 16px rgba(212, 160, 23, 0.3);
-            transform: translateY(-1px);
-        }
-        .battle-actions button:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-
         .battle-log {
             background: rgba(0, 0, 0, 0.7);
             border: 1px solid #333;
@@ -698,6 +661,7 @@
                     <button class="close-btn" id="crafting-close">Fechar (C)</button>
                 </div>
 
+                <!-- BATALHA SEM BOTÕES: apenas a área de tecelagem e a corda -->
                 <div class="battle-overlay hidden" id="battle-overlay">
                     <div class="battle-enemy-area">
                         <div class="battle-enemy-name" id="battle-enemy-name">Fio Corrompido</div>
@@ -720,18 +684,9 @@
                     </div>
                     <div class="battle-stats">
                         <span>HP: <span class="hp-display" id="battle-player-hp">100/100</span></span>
-                        <span>MP: <span class="mp-display" id="battle-player-mp">50/50</span></span>
                         <span id="battle-enemy-hp">Inimigo HP: 60/60</span>
                     </div>
                     <div class="battle-log" id="battle-log">A batalha começa...</div>
-                    <div class="battle-actions" id="battle-actions">
-                        <button data-action="weave">🧵 Tecer (Espaço)</button>
-                        <button data-action="defend">🛡️ Defender</button>
-                        <button data-action="concentrate">🧘 Concentrar</button>
-                        <button data-action="item">🧪 Poção</button>
-                        <button data-action="flee">🏃 Fugir</button>
-                        <button data-action="final-strike" id="final-strike-btn" disabled>⚡ Arremate Final</button>
-                    </div>
                 </div>
 
                 <div class="title-screen" id="title-screen">
@@ -751,7 +706,7 @@
                         <tr><th>🧵 BATALHA DE TECELAGEM</th><th>📜 REGRAS</th></tr>
                         <tr><td>Linha verde</td><td>Pressione ESPAÇO para sincronizar: dano + selamento</td></tr>
                         <tr><td>Linha vermelha</td><td>Erro causa retaliação e perda de progresso</td></tr>
-                        <tr><td>Selamento 100%</td><td>Linha fica amarela: use Arremate Final</td></tr>
+                        <tr><td>Selamento 100%</td><td>O inimigo é derrotado automaticamente</td></tr>
                         <tr><th>🌀 EXPLORAÇÃO</th><th>📍 DICAS</th></tr>
                         <tr><td>Fendas roxas</td><td>Viaje entre passado e presente</td></tr>
                         <tr><td>Grama alta</td><td>Encontros com inimigos</td></tr>
@@ -771,7 +726,7 @@
     <script>
         // ============================================================
         //  ECHOES OF THE LOOM — Ecos do Tear
-        //  Versão com corda corrompida, tabela de instruções e mapa melhorado
+        //  Batalha simplificada: apenas tecelagem com espaço, sem botões
         // ============================================================
 
         const TILE_SIZE = 32;
@@ -1312,7 +1267,7 @@
 
         document.getElementById('dialog-box').addEventListener('click', advanceDialog);
 
-        // ============ BATALHA DE TECELAGEM ============
+        // ============ BATALHA DE TECELAGEM (SEM BOTÕES) ============
         function startBattle(enemyType) {
             const enemy = {
                 ...enemyType,
@@ -1326,8 +1281,7 @@
             battleState = {
                 enemy: enemy,
                 playerHp: player.hp,
-                playerMp: player.mp,
-                defending: false,
+                defending: false, // não usado, mas mantido para compatibilidade
                 weave: {
                     pos: 0,
                     dir: 1,
@@ -1337,7 +1291,7 @@
                     finalStrikeAvailable: false,
                     stunned: false,
                 },
-                log: ['A batalha começa... teça a linha no momento certo!'],
+                log: ['A batalha começa... Pressione ESPAÇO para tecer!'],
             };
             gameState = 'battling';
             document.getElementById('battle-overlay').classList.remove('hidden');
@@ -1345,11 +1299,9 @@
             document.getElementById('weave-line').className = 'weave-line';
             document.getElementById('seal-bar-fill').style.width = '0%';
             document.getElementById('seal-percent').textContent = '0%';
-            document.getElementById('final-strike-btn').disabled = true;
             renderBattleEnemySprite();
             renderWeaveZones();
             updateBattleUI();
-            updateBattleLog('Um ' + enemy.name + ' surge! Sincronize a linha verde!');
             updateBattleStats();
         }
 
@@ -1427,22 +1379,17 @@
             enemy.attackTimer += deltaTime;
             if (enemy.attackTimer >= enemy.attackInterval) {
                 enemy.attackTimer = 0;
-                if (!battleState.defending) {
-                    let dmg = enemy.atk;
-                    if (player.equippedCloak === 'seda_estelar' && Math.random() < 0.2) {
-                        updateBattleLog('🌟 Esquiva do manto!');
-                    } else {
-                        battleState.playerHp = Math.max(0, battleState.playerHp - dmg);
-                        updateBattleLog('💢 ' + enemy.name + ' causou ' + dmg + ' de dano.');
-                        spawnParticles(200, 200, '#8e44ad', 6, 20);
-                        if (battleState.playerHp <= 0) {
-                            endBattle(false);
-                            return;
-                        }
-                    }
+                let dmg = enemy.atk;
+                if (player.equippedCloak === 'seda_estelar' && Math.random() < 0.2) {
+                    updateBattleLog('🌟 Esquiva do manto!');
                 } else {
-                    updateBattleLog('🛡️ Defesa reduziu o dano.');
-                    battleState.defending = false;
+                    battleState.playerHp = Math.max(0, battleState.playerHp - dmg);
+                    updateBattleLog('💢 ' + enemy.name + ' causou ' + dmg + ' de dano.');
+                    spawnParticles(200, 200, '#8e44ad', 6, 20);
+                    if (battleState.playerHp <= 0) {
+                        endBattle(false);
+                        return;
+                    }
                 }
                 updateBattleStats();
             }
@@ -1459,7 +1406,7 @@
             cordCtx.lineWidth = 2;
             cordCtx.beginPath();
             const baseY = 40;
-            const amplitude = Math.max(0, 30 - progress * 0.3); // amplitude diminui com progresso
+            const amplitude = Math.max(0, 30 - progress * 0.3);
             const steps = 60;
             for (let i = 0; i <= steps; i++) {
                 const x = (i / steps) * 300;
@@ -1469,7 +1416,6 @@
             }
             cordCtx.stroke();
 
-            // Nós (knots) que desaparecem conforme progresso
             const knotCount = Math.ceil((1 - progress / 100) * 5);
             for (let k = 0; k < knotCount; k++) {
                 const x = 40 + k * 55;
@@ -1480,7 +1426,6 @@
                 cordCtx.fill();
             }
 
-            // Se progresso 100%, desenha linha dourada reta
             if (progress >= 100) {
                 cordCtx.strokeStyle = '#f1c40f';
                 cordCtx.lineWidth = 3;
@@ -1513,9 +1458,10 @@
                     spawnParticles(400, 250, '#2ecc71', 8, 20);
                     if (weave.progress >= 100) {
                         weave.finalStrikeAvailable = true;
-                        document.getElementById('final-strike-btn').disabled = false;
                         document.getElementById('weave-line').classList.add('yellow');
-                        updateBattleLog('🟨 LINHA SELADA! Arremate Final disponível!');
+                        updateBattleLog('🟨 LINHA SELADA! Inimigo derrotado!');
+                        // Derrota automática do inimigo
+                        setTimeout(() => endBattle(true), 500);
                     }
                 } else if (hit.type === 'red') {
                     const retaliation = Math.floor(battleState.enemy.atk * 1.2);
@@ -1534,56 +1480,9 @@
             updateBattleStats();
             if (battleState.enemy.hp <= 0) {
                 endBattle(true);
-                return;
             }
             if (battleState.playerHp <= 0) {
                 endBattle(false);
-            }
-        }
-
-        function playerFinalStrike() {
-            if (!battleState || !battleState.weave.finalStrikeAvailable) return;
-            updateBattleLog('⚡ ARREMATE FINAL! O inimigo é destruído!');
-            battleState.enemy.hp = 0;
-            endBattle(true);
-        }
-
-        function playerDefend() {
-            if (!battleState) return;
-            battleState.defending = true;
-            updateBattleLog('🛡️ Defesa ativada para o próximo ataque.');
-        }
-
-        function playerConcentrate() {
-            if (!battleState) return;
-            const mpGain = 15;
-            battleState.playerMp = Math.min(player.maxMp, battleState.playerMp + mpGain);
-            updateBattleLog('🧘 Concentração: +' + mpGain + ' MP');
-            updateBattleStats();
-        }
-
-        function playerUseItem() {
-            if (!battleState) return;
-            if (player.inventory.potions > 0) {
-                player.inventory.potions--;
-                const heal = 35 + player.level * 3;
-                battleState.playerHp = Math.min(player.maxHp, battleState.playerHp + heal);
-                updateBattleLog('🧪 Poção: +' + heal + ' HP');
-                updateBattleStats();
-            } else {
-                updateBattleLog('Sem poções!');
-            }
-        }
-
-        function playerFlee() {
-            if (!battleState) return;
-            let fleeChance = 0.4;
-            if (player.equippedCloak === 'sombras') fleeChance += 0.25;
-            if (Math.random() < fleeChance) {
-                updateBattleLog('🏃 Fugiu!');
-                setTimeout(() => endBattle(false), 500);
-            } else {
-                updateBattleLog('Falha na fuga!');
             }
         }
 
@@ -1600,7 +1499,7 @@
                 checkLevelUp();
             }
             player.hp = battleState.playerHp;
-            player.mp = battleState.playerMp;
+            player.mp = player.maxMp; // restaura MP após batalha
             battleState = null;
             gameState = 'exploring';
             document.getElementById('battle-overlay').classList.add('hidden');
@@ -1623,7 +1522,6 @@
         function updateBattleStats() {
             if (!battleState) return;
             document.getElementById('battle-player-hp').textContent = battleState.playerHp + '/' + player.maxHp;
-            document.getElementById('battle-player-mp').textContent = battleState.playerMp + '/' + player.maxMp;
             document.getElementById('battle-enemy-hp').textContent =
                 battleState.enemy.name + ' HP: ' + battleState.enemy.hp + '/' + battleState.enemy.maxHp;
         }
@@ -1917,11 +1815,7 @@
             if (key === ' ') {
                 e.preventDefault();
                 if (gameState === 'battling' && !battleState.weave.stunned) {
-                    if (battleState.weave.finalStrikeAvailable) {
-                        playerFinalStrike();
-                    } else {
-                        playerWeave();
-                    }
+                    playerWeave();
                 }
             }
             if (key === 'c') {
@@ -1935,36 +1829,6 @@
 
         document.addEventListener('keyup', (e) => {
             keys[e.key.toLowerCase()] = false;
-        });
-
-        document.querySelectorAll('#battle-actions button').forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (!battleState) return;
-                const action = btn.dataset.action;
-                switch (action) {
-                    case 'weave':
-                        if (!battleState.weave.stunned) {
-                            if (battleState.weave.finalStrikeAvailable) playerFinalStrike();
-                            else playerWeave();
-                        }
-                        break;
-                    case 'final-strike':
-                        playerFinalStrike();
-                        break;
-                    case 'defend':
-                        playerDefend();
-                        break;
-                    case 'concentrate':
-                        playerConcentrate();
-                        break;
-                    case 'item':
-                        playerUseItem();
-                        break;
-                    case 'flee':
-                        playerFlee();
-                        break;
-                }
-            });
         });
 
         document.getElementById('crafting-close').addEventListener('click', toggleCrafting);
@@ -2082,7 +1946,7 @@
         }
 
         init();
-        console.log('🎮 Echoes of the Loom com corda corrompida e tabela de instruções!');
+        console.log('🎮 Echoes of the Loom — batalha simplificada com tecelagem.');
     </script>
 </body>
 </html>
